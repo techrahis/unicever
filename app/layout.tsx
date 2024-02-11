@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import { ModeToggle } from "@/components/ModeToggle";
+import { ThemeProvider } from "@/components/shared/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,8 +29,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* <ModeToggle /> */}
           {children}
+          <span style={{ position: "fixed", bottom: "1rem", left: "1rem" }}>
+            <ThemeToggle />
+          </span>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
