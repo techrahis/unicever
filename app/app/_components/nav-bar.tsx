@@ -1,5 +1,4 @@
 import { UserButton } from "@clerk/nextjs";
-import { IdCardIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 
 export default function DashboardNav() {
@@ -9,10 +8,7 @@ export default function DashboardNav() {
         <h1 className="text-2xl font-bold">Unicever</h1>
       </Link>
       <section className="flex space-x-4 items-center">
-        <UserButton afterSignOutUrl="/" />
-        <Link href="/app/organization">
-          <IdCardIcon className="w-7 h-7" />
-        </Link>
+        <UserButton showName={true} afterSignOutUrl="/" />
       </section>
     </nav>
   );
