@@ -1,5 +1,3 @@
-import PrivateRoute from "@/components/shared/private-route";
-
 async function Dashboard() {
   return (
     <div>
@@ -9,4 +7,4 @@ async function Dashboard() {
   );
 }
 
-export default PrivateRoute(Dashboard);
+export default Dashboard;
