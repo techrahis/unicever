@@ -1,5 +1,5 @@
-import DashboardFooter from "@/app/dashboard/_components/footer";
-import DashboardHeader from "@/app/dashboard/_components/header";
+import DashboardFooter from "@/app/app/_components/footer";
+import DashboardHeader from "@/app/app/_components/header";
 
 export default function DashboardLayout({
   children,
@@ -7,7 +7,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main>
+    <main className="">
       <DashboardHeader />
       {children}
       <DashboardFooter />

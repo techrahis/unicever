@@ -1,10 +1,9 @@
-import { ClerkProvider } from "@clerk/nextjs";
+import AuthProvider from "@/components/shared/auth-provider";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/shared/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
-import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { ThemeProvider } from "@/components/shared/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <AuthProvider>
       <html lang="en">
         <body className={inter.className}>
           <ThemeProvider
@@ -32,13 +31,10 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
-            <span style={{ position: "fixed", bottom: "1rem", left: "1rem" }}>
-              <ThemeToggle />
-            </span>
             <Toaster />
           </ThemeProvider>
         </body>
       </html>
-    </ClerkProvider>
+    </AuthProvider>
   );
 }
