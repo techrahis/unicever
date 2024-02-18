@@ -1,5 +1,4 @@
-import DashboardFooter from "@/app/app/_components/footer";
-import DashboardHeader from "@/app/app/_components/header";
+import DashboardNav from "@/app/app/_components/nav-bar";
 
 export default function DashboardLayout({
   children,
@@ -8,9 +7,8 @@ export default function DashboardLayout({
 }>) {
   return (
     <main className="">
-      <DashboardHeader />
+      <DashboardNav />
       {children}
-      <DashboardFooter />
     </main>
   );
 }
