@@ -3,8 +3,7 @@ import * as z from "zod";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SignInSchema } from "@/schemas/auth";
-import Link from "next/link";
+import { SignUpSchema } from "@/schemas/auth";
 
 import { Input } from "@/components/ui/input";
 import {
@@ -21,26 +20,27 @@ import { CardWrapper } from "@/app/auth/_components/card-wrapper";
 import { FormError } from "@/app/_components/form-error";
 import { FormSuccess } from "@/app/_components/form-success";
 
-import { signIn } from "@/server/sign-in";
+import { signUp } from "@/server/sign-up";
 
-export default function SignInForm() {
+export default function SignUpForm() {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<z.infer<typeof SignInSchema>>({
-    resolver: zodResolver(SignInSchema),
+  const form = useForm<z.infer<typeof SignUpSchema>>({
+    resolver: zodResolver(SignUpSchema),
     defaultValues: {
+      organization: "",
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = (data: z.infer<typeof SignInSchema>) => {
+  const onSubmit = (data: z.infer<typeof SignUpSchema>) => {
     setError(undefined);
     setSuccess(undefined);
     startTransition(() => {
-      signIn(data).then((data) => {
+      signUp(data).then((data) => {
         setError(data.error);
         setSuccess(data.success);
       });
@@ -49,14 +49,31 @@ export default function SignInForm() {
 
   return (
     <CardWrapper
-      headerLabel="Welcome back!"
-      backBtnLabel="Don't have an account? Sign up here."
-      backBtnHref="/auth/sign-up"
+      headerLabel="Create an account!"
+      backBtnLabel="Already have an account? Sign in here."
+      backBtnHref="/auth/sign-in"
       showSocial={true}
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <section className="space-y-4">
+            <FormField
+              control={form.control}
+              name="organization"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Organization</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      disabled={isPending}
+                      placeholder="Example Corp."
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="email"
@@ -89,14 +106,6 @@ export default function SignInForm() {
                       type="password"
                     />
                   </FormControl>
-                  <Button
-                    size="sm"
-                    variant="link"
-                    asChild
-                    className="px-0 font-normal"
-                  >
-                    <Link href="/auth/forgot-password">Forgot password?</Link>
-                  </Button>
                   <FormMessage />
                 </FormItem>
               )}
@@ -105,7 +114,7 @@ export default function SignInForm() {
           <FormError message={error} />
           <FormSuccess message={success} />
           <Button disabled={isPending} type="submit" className="w-full">
-            Sign in
+            Sign up
           </Button>
         </form>
       </Form>
