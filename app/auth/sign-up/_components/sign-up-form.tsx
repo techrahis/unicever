@@ -62,12 +62,12 @@ export default function SignUpForm() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Organization Name</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       disabled={isPending}
-                      placeholder="Example Corp."
+                      placeholder="Rahis Dev"
                     />
                   </FormControl>
                   <FormMessage />
@@ -84,7 +84,7 @@ export default function SignUpForm() {
                     <Input
                       {...field}
                       disabled={isPending}
-                      placeholder="contact@example.com"
+                      placeholder="hello@rahis.dev"
                       type="email"
                     />
                   </FormControl>

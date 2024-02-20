@@ -73,7 +73,7 @@ export default function SignInForm() {
                     <Input
                       {...field}
                       disabled={isPending}
-                      placeholder="contact@example.com"
+                      placeholder="hello@rahis.dev"
                       type="email"
                     />
                   </FormControl>
