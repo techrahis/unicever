@@ -1,6 +1,8 @@
 "use server";
 
+import prisma from "@/lib/db";
 import * as z from "zod";
+import bcrypt from "bcrypt";
 import { SignUpSchema } from "@/schemas/auth";
 
 export const signUp = async (data: z.infer<typeof SignUpSchema>) => {
@@ -9,5 +11,24 @@ export const signUp = async (data: z.infer<typeof SignUpSchema>) => {
   if (!validatedData.success) {
     return { error: "Invalid fields!" };
   }
-  return { success: "Email sent!" };
+  const { organizationName, email, password } = validatedData.data;
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (existingUser) {
+    return { error: "User already exists!" };
+  }
+
+  await prisma.user.create({
+    data: {
+      organizationName,
+      email,
+      password: hashedPassword,
+    },
+  });
+
+  return { success: "User created successfully!" };
 };
