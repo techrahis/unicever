@@ -2,11 +2,11 @@
 
 import prisma from "@/lib/prisma";
 import * as z from "zod";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { SignUpSchema } from "@/schemas/auth";
 import { getUserByEmail } from "@/lib/get-user-by-email";
 
-export const signUp = async (data: z.infer<typeof SignUpSchema>) => {
+export const signUpAction = async (data: z.infer<typeof SignUpSchema>) => {
   const validatedData = SignUpSchema.safeParse(data);
 
   if (!validatedData.success) {

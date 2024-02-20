@@ -20,7 +20,7 @@ import { CardWrapper } from "@/app/auth/_components/card-wrapper";
 import { FormError } from "@/app/_components/form-error";
 import { FormSuccess } from "@/app/_components/form-success";
 
-import { signUp } from "@/server/sign-up";
+import { signUpAction } from "@/server/sign-up";
 
 export default function SignUpForm() {
   const [error, setError] = useState<string | undefined>("");
@@ -40,7 +40,7 @@ export default function SignUpForm() {
     setError(undefined);
     setSuccess(undefined);
     startTransition(() => {
-      signUp(data).then((data) => {
+      signUpAction(data).then((data) => {
         setError(data.error);
         setSuccess(data.success);
       });

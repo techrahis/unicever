@@ -21,7 +21,7 @@ import { CardWrapper } from "@/app/auth/_components/card-wrapper";
 import { FormError } from "@/app/_components/form-error";
 import { FormSuccess } from "@/app/_components/form-success";
 
-import { signIn } from "@/server/sign-in";
+import { signInAction } from "@/server/sign-in";
 
 export default function SignInForm() {
   const [error, setError] = useState<string | undefined>("");
@@ -40,7 +40,7 @@ export default function SignInForm() {
     setError(undefined);
     setSuccess(undefined);
     startTransition(() => {
-      signIn(data).then((data) => {
+      signInAction(data).then((data) => {
         setError(data.error);
         setSuccess(data.success);
       });
