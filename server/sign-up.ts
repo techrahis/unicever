@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "@/lib/db";
+import prisma from "@/lib/prisma";
 import * as z from "zod";
 import bcrypt from "bcrypt";
 import { SignUpSchema } from "@/schemas/auth";
