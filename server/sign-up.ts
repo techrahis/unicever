@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import * as z from "zod";
 import bcrypt from "bcrypt";
 import { SignUpSchema } from "@/schemas/auth";
+import { getUserByEmail } from "@/lib/get-user-by-email";
 
 export const signUp = async (data: z.infer<typeof SignUpSchema>) => {
   const validatedData = SignUpSchema.safeParse(data);
@@ -14,9 +15,7 @@ export const signUp = async (data: z.infer<typeof SignUpSchema>) => {
   const { organizationName, email, password } = validatedData.data;
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
-  });
+  const existingUser = await getUserByEmail(email);
 
   if (existingUser) {
     return { error: "User already exists!" };
