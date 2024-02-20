@@ -10,7 +10,7 @@ export const SignInSchema = z.object({
 });
 
 export const SignUpSchema = z.object({
-  organizationName: z.string().min(1, {
+  name: z.string().min(1, {
     message: "Please enter your organization name",
   }),
   email: z.string().email({

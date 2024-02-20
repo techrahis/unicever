@@ -30,7 +30,7 @@ export default function SignUpForm() {
   const form = useForm<z.infer<typeof SignUpSchema>>({
     resolver: zodResolver(SignUpSchema),
     defaultValues: {
-      organizationName: "",
+      name: "",
       email: "",
       password: "",
     },
@@ -59,7 +59,7 @@ export default function SignUpForm() {
           <section className="space-y-4">
             <FormField
               control={form.control}
-              name="organizationName"
+              name="name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Organization Name</FormLabel>

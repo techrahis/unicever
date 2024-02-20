@@ -12,7 +12,7 @@ export const signUpAction = async (data: z.infer<typeof SignUpSchema>) => {
   if (!validatedData.success) {
     return { error: "Invalid fields!" };
   }
-  const { organizationName, email, password } = validatedData.data;
+  const { name, email, password } = validatedData.data;
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const existingUser = await getUserByEmail(email);
@@ -23,7 +23,7 @@ export const signUpAction = async (data: z.infer<typeof SignUpSchema>) => {
 
   await prisma.user.create({
     data: {
-      organizationName,
+      name,
       email,
       password: hashedPassword,
     },

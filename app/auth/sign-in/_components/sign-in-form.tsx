@@ -1,6 +1,7 @@
 "use client";
 import * as z from "zod";
 import { useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SignInSchema } from "@/schemas/auth";
@@ -24,6 +25,12 @@ import { FormSuccess } from "@/app/_components/form-success";
 import { signInAction } from "@/server/sign-in";
 
 export default function SignInForm() {
+  const searchParams = useSearchParams();
+  const urlError =
+    searchParams.get("error") === "OAuthAccountNotLinked"
+      ? "Email already in use with different provider!"
+      : "";
+
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
@@ -41,8 +48,7 @@ export default function SignInForm() {
     setSuccess(undefined);
     startTransition(() => {
       signInAction(data).then((data) => {
-        setError(data.error);
-        setSuccess(data.success);
+        setError(data?.error);
       });
     });
   };
@@ -102,7 +108,7 @@ export default function SignInForm() {
               )}
             />
           </section>
-          <FormError message={error} />
+          <FormError message={error || urlError} />
           <FormSuccess message={success} />
           <Button disabled={isPending} type="submit" className="w-full">
             Sign in
