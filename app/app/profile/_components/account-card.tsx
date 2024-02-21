@@ -12,9 +12,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CheckIcon } from "@radix-ui/react-icons";
+import prisma from "@/lib/prisma";
 
 export default async function AccountCard() {
   const session = await auth();
+  const user = await prisma.user.findUnique({
+    where: {
+      id: session?.user.id,
+    },
+  });
   return (
     <Card className="mt-4">
       <CardHeader>
@@ -30,16 +36,16 @@ export default async function AccountCard() {
             <Label htmlFor="picture">Profile picture</Label>
             <section className="flex space-x-2 items-center">
               <Avatar>
-                <AvatarImage src={session?.user.image || undefined} />
+                <AvatarImage src={user?.image || undefined} />
                 <AvatarFallback className="uppercase font-bold">
-                  {session?.user.name
-                    ? session.user.name.split(" ").length > 1
-                      ? session.user.name
+                  {user?.name
+                    ? user.name.split(" ").length > 1
+                      ? user.name
                           .split(" ")
                           .slice(0, 2)
                           .map((name) => name[0])
                           .join("")
-                      : session.user.name.slice(0, 2)
+                      : user.name.slice(0, 2)
                     : ""}
                 </AvatarFallback>
               </Avatar>
@@ -47,12 +53,11 @@ export default async function AccountCard() {
             </section>
           </div>
           <div className="space-y-1 w-full">
-            <Label htmlFor="email">User id</Label>
+            <Label htmlFor="phone">Phone</Label>
             <Input
-              type="email"
-              id="email"
-              defaultValue={session?.user.id || undefined}
-              disabled
+              type="number"
+              id="phone"
+              defaultValue={user?.phone || undefined}
             />
           </div>
         </section>
@@ -74,7 +79,7 @@ export default async function AccountCard() {
         </section>
       </CardContent>
       <CardFooter>
-        <Button>
+        <Button type="submit">
           <CheckIcon className="w-4 h-4 mr-2" />
           Save changes
         </Button>

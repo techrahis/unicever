@@ -27,7 +27,7 @@ export default async function OrganizationCard() {
       <CardContent className="space-y-4">
         <section className="flex flex-col justify-between space-y-4 sm:space-y-0 sm:space-x-4 sm:flex-row">
           <div className="space-y-1 w-full">
-            <Label htmlFor="picture">Profile picture</Label>
+            <Label htmlFor="picture">Logo</Label>
             <section className="flex space-x-2 items-center">
               <Avatar>
                 <AvatarImage src={session?.user.image || undefined} />
@@ -47,13 +47,8 @@ export default async function OrganizationCard() {
             </section>
           </div>
           <div className="space-y-1 w-full">
-            <Label htmlFor="email">User id</Label>
-            <Input
-              type="email"
-              id="email"
-              defaultValue={session?.user.id || undefined}
-              disabled
-            />
+            <Label htmlFor="email">Email</Label>
+            <Input type="email" id="email" />
           </div>
         </section>
 
