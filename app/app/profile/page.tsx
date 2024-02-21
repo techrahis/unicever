@@ -1,5 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PersonIcon, BackpackIcon } from "@radix-ui/react-icons";
+import AccountCard from "@/app/app/profile/_components/account-card";
+import OrganizationCard from "@/app/app/profile/_components/organization-card";
 
 export default async function Settings() {
   return (
@@ -13,7 +15,7 @@ export default async function Settings() {
               Account
             </span>
           </TabsTrigger>
-          <TabsTrigger value="password">
+          <TabsTrigger value="organization">
             <span className="flex items-center">
               <BackpackIcon className="w-4 h-4 mr-2" />
               Organization
@@ -21,9 +23,11 @@ export default async function Settings() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="account">
-          Make changes to your account here.
+          <AccountCard />
         </TabsContent>
-        <TabsContent value="password">Change your password here.</TabsContent>
+        <TabsContent value="organization">
+          <OrganizationCard />
+        </TabsContent>
       </Tabs>
     </div>
   );
