@@ -15,7 +15,6 @@ import Link from "next/link";
 
 export default async function NavBar() {
   const session = await auth();
-  console.log(session?.user.image);
 
   return (
     <nav className="flex justify-between items-center border-b-2 py-3">
@@ -25,7 +24,9 @@ export default async function NavBar() {
       <section className="flex items-center space-x-2">
         <span>
           <h1 className="text-sm font-bold">Hola 👋🏻</h1>
-          <h1 className="text-sm font-bold">{session?.user.name}</h1>
+          <h1 className="text-sm font-bold">
+            {session?.user.name}
+          </h1>
         </span>
         <DropdownMenu>
           <DropdownMenuTrigger>
