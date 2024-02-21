@@ -6,6 +6,7 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "next-themes";
+import { SunIcon, MoonIcon, LaptopIcon } from "@radix-ui/react-icons";
 
 export default function ThemeChanger() {
   const currentTheme = localStorage.getItem("theme") as string;
@@ -14,13 +15,13 @@ export default function ThemeChanger() {
   return (
     <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
       <DropdownMenuRadioItem value="light" onClick={() => setTheme("light")}>
-        Light
+        Light <SunIcon className="w-4 h-4 ml-2" />
       </DropdownMenuRadioItem>
       <DropdownMenuRadioItem value="dark" onClick={() => setTheme("dark")}>
-        Dark
+        Dark <MoonIcon className="w-4 h-4 ml-2" />
       </DropdownMenuRadioItem>
       <DropdownMenuRadioItem value="system" onClick={() => setTheme("system")}>
-        System
+        System <LaptopIcon className="w-4 h-4 ml-2" />
       </DropdownMenuRadioItem>
     </DropdownMenuRadioGroup>
   );

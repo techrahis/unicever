@@ -1,6 +1,5 @@
 import { auth, signOut } from "@/auth";
 import Image from "next/image";
-import DemoProfileImage from "../_assets/demo-profile.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,8 +8,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { IoSettingsOutline } from "react-icons/io5";
-import { MdLogout } from "react-icons/md";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PersonIcon, ExitIcon, FrameIcon } from "@radix-ui/react-icons";
 import ThemeChanger from "./theme-changer";
 import Link from "next/link";
 
@@ -19,7 +18,7 @@ export default async function NavBar() {
   console.log(session?.user.image);
 
   return (
-    <nav className="flex justify-between items-center border-b-2 px-2 sm:px-20 py-3">
+    <nav className="flex justify-between items-center border-b-2 py-3">
       <Link href="/app">
         <Image src="/logo.svg" alt="Unicever Logo" width={150} height={150} />
       </Link>
@@ -30,21 +29,33 @@ export default async function NavBar() {
         </span>
         <DropdownMenu>
           <DropdownMenuTrigger>
-            <Image
-              className="rounded-full"
-              src={session?.user.image || DemoProfileImage}
-              alt="Unicever Logo"
-              width={45}
-              height={45}
-            />
+            <Avatar>
+              <AvatarImage src={session?.user.image || undefined} />
+              <AvatarFallback className="uppercase font-bold">
+                {session?.user.name
+                  ? session.user.name.split(" ").length > 1
+                    ? session.user.name
+                        .split(" ")
+                        .slice(0, 2)
+                        .map((name) => name[0])
+                        .join("")
+                    : session.user.name.slice(0, 2)
+                  : ""}
+              </AvatarFallback>
+            </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56 mr-4">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>
+              <span className="flex items-center">
+                <FrameIcon className="w-4 h-4 mr-2" />
+                My Account
+              </span>
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <Link href="/app/settings">
+            <Link href="/app/profile">
               <DropdownMenuItem>
-                <IoSettingsOutline className="w-6 h-6" />
-                <p className="ml-1">Settings</p>
+                <PersonIcon className="w-4 h-4" />
+                <p className="ml-2">Profile</p>
               </DropdownMenuItem>
             </Link>
             <DropdownMenuItem>
@@ -55,13 +66,18 @@ export default async function NavBar() {
                 }}
               >
                 <button className="flex items-center" type="submit">
-                  <MdLogout className="w-6 h-6" />
-                  <p className="ml-1">Sign out</p>
+                  <ExitIcon className="w-4 h-4" />
+                  <p className="ml-2">Sign out</p>
                 </button>
               </form>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+            <DropdownMenuLabel>
+              <span className="flex items-center">
+                <FrameIcon className="w-4 h-4 mr-2" />
+                Appearance
+              </span>
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <ThemeChanger />
           </DropdownMenuContent>
