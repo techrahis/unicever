@@ -1,9 +1,25 @@
+import { auth } from "@/auth";
+import prisma from "@/lib/prisma";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PersonIcon, BackpackIcon } from "@radix-ui/react-icons";
 import AccountCard from "@/app/app/profile/_components/account-card";
 import OrganizationCard from "@/app/app/profile/_components/organization-card";
 
 export default async function Settings() {
+  const session = await auth();
+  const fetchedUser = await prisma.user.findUnique({
+    where: {
+      id: session?.user.id,
+    },
+    select: {
+      id: true,
+      name: true,
+      phone: true,
+      email: true,
+      image: true,
+    },
+  });
+
   return (
     <div className="">
       <h1 className="text-4xl font-semibold">Profile</h1>
@@ -23,7 +39,7 @@ export default async function Settings() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="account">
-          <AccountCard />
+          <AccountCard user={fetchedUser} />
         </TabsContent>
         <TabsContent value="organization">
           <OrganizationCard />
