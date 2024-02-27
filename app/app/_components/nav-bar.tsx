@@ -1,4 +1,5 @@
 import { auth, signOut } from "@/auth";
+import prisma from "@/lib/prisma";
 import Image from "next/image";
 import {
   DropdownMenu,
@@ -16,6 +17,19 @@ import Link from "next/link";
 export default async function NavBar() {
   const session = await auth();
 
+  const user = await prisma.user.findUnique({
+    where: {
+      id: session?.user.id,
+    },
+    select: {
+      id: true,
+      name: true,
+      phone: true,
+      email: true,
+      image: true,
+    },
+  });
+
   return (
     <nav className="flex justify-between items-center border-b-2 py-3">
       <Link href="/app">
@@ -24,14 +38,12 @@ export default async function NavBar() {
       <section className="flex items-center space-x-2">
         <span>
           <h1 className="text-sm font-bold">Hola 👋🏻</h1>
-          <h1 className="text-sm font-bold">
-            {session?.user.name}
-          </h1>
+          <h1 className="text-sm font-bold">{user?.name}</h1>
         </span>
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Avatar>
-              <AvatarImage src={session?.user.image || undefined} />
+              <AvatarImage src={user?.image || undefined} />
               <AvatarFallback className="uppercase font-bold">
                 {session?.user.name
                   ? session.user.name.split(" ").length > 1
