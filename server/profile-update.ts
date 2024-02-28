@@ -4,14 +4,7 @@ import * as z from "zod";
 import { AccountSchemaBackend } from "@/schemas/profile";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { StorageClient } from "@supabase/storage-js";
-
-const STORAGE_URL = process.env.STORAGE_URL || "";
-const SERVICE_KEY = process.env.SERVICE_KEY || "";
-const storageClient = new StorageClient(STORAGE_URL, {
-  apikey: SERVICE_KEY,
-  Authorization: `Bearer ${SERVICE_KEY}`,
-});
+import storageClient from "@/lib/storageClient";
 
 export const updateAccountAction = async (
   data: z.infer<typeof AccountSchemaBackend>
