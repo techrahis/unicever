@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PersonIcon, BackpackIcon } from "@radix-ui/react-icons";
 import AccountCard from "@/app/app/profile/_components/account-card";
 import OrganizationCard from "@/app/app/profile/_components/organization-card";
+import { getOrganization } from "@/server/organization-crud";
 
 export default async function Settings() {
   const session = await auth();
@@ -20,6 +21,8 @@ export default async function Settings() {
     },
   });
 
+  const organization = await getOrganization(fetchedUser?.id as string);
+  console.log(organization)
   return (
     <div className="">
       <h1 className="text-4xl font-semibold">Profile</h1>
@@ -42,7 +45,7 @@ export default async function Settings() {
           <AccountCard user={fetchedUser} />
         </TabsContent>
         <TabsContent value="organization">
-          <OrganizationCard />
+          <OrganizationCard userId={fetchedUser?.id} organizationDetails={organization} />
         </TabsContent>
       </Tabs>
     </div>

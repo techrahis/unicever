@@ -49,14 +49,14 @@ model Account {
 
 model Organization {
   id          String  @id @default(cuid())
-  userId      String
+  userId      String @unique
   name        String
   description String?
   address     String?
   phone       String?
   email       String?
   image       String?
-  logo        String?
+  logo        Json
   events      Event[]
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
