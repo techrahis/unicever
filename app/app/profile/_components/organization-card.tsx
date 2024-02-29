@@ -20,7 +20,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
-import storageClient from "@/lib/storageClient";
 import { OrganizationSchema } from "@/schemas/organization";
 import {
   OrganizationCreate,
@@ -55,53 +54,47 @@ export default function OrganizationCard({
   });
 
   const [isPending, startTransition] = useTransition();
-  const avatar = JSON.parse(organizationDetails?.logo as string);
+  const avatar =
+    typeof organizationDetails?.logo === "string"
+      ? JSON.parse(organizationDetails?.logo)
+      : organizationDetails?.logo;
 
   //create or update organization data
   const onSubmit = async (values: z.infer<typeof OrganizationSchema>) => {
     //getting logo image
-    const logo: File = form.getValues("logo")[0];
-
-    //checking if organization exist or not
-    if (organizationDetails) {
-      //if exist update
-      startTransition(async () => {
-        const { data, error } = await storageClient
-          .from("s1-dev/avatar")
-          .upload(`${userId}-${logo.name}`, logo, {
-            cacheControl: "3600",
-          });
-        console.log(data);
-        const { message, variant } = await OrganizationUpdate({
-          values: { ...values, logo: data },
-          id: organizationDetails.id,
-        });
-
-        toast({
-          title: message,
-          variant: variant === "success" ? "success" : "error",
-        });
-      });
-    } else {
-      //else create
-      startTransition(async () => {
-        const { data, error } = await storageClient
-          .from("s1-dev/avatar")
-          .upload(`${userId}-${logo.name}`, logo, {
-            cacheControl: "3600",
-          });
-        const { message, variant } = await OrganizationCreate({
-          ...values,
-          userId: userId as string,
-          logo: data,
-        });
-
-        toast({
-          title: message,
-          variant: variant === "success" ? "success" : "error",
-        });
-      });
+    const formData = new FormData();
+    const avatar: File = form.getValues("logo")[0];
+    const {
+      logo,
+      image,
+      ...details
+    }: {
+      [key: string]: string;
+    } = values;
+    for (const key in details) {
+      formData.append(key, details[key]);
     }
+    formData.append("userId", userId as string);
+    formData.append("logo", avatar);
+    startTransition(async () => {
+      //checking weather organization exists or not
+      if (organizationDetails) {
+        const { message, variant } = await OrganizationUpdate({
+          formData,
+          existOrganization: organizationDetails!,
+        });
+        toast({
+          title: message,
+          variant: variant === "success" ? "success" : "error",
+        });
+      } else {
+        const { message, variant } = await OrganizationCreate(formData);
+        toast({
+          title: message,
+          variant: variant === "success" ? "success" : "error",
+        });
+      }
+    });
   };
 
   return (
@@ -126,7 +119,7 @@ export default function OrganizationCard({
                       <Label htmlFor="logo">Logo</Label>
                       <section className="flex space-x-2 items-center">
                         <Avatar>
-                          <AvatarImage src={avatar.src} />
+                          <AvatarImage src={avatar?.src} />
                           <AvatarFallback className="uppercase font-bold">
                             hk
                           </AvatarFallback>

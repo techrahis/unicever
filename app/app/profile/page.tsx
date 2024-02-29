@@ -22,7 +22,7 @@ export default async function Settings() {
   });
 
   const organization = await getOrganization(fetchedUser?.id as string);
-  console.log(organization)
+  //console.log(organization)
   return (
     <div className="">
       <h1 className="text-4xl font-semibold">Profile</h1>
