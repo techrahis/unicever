@@ -1,12 +1,10 @@
 "use server";
 
-import { OrganizationSchema } from "@/schemas/organization";
-import { z } from "zod";
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
-import { Prisma } from "@prisma/client";
 import storageClient from "@/lib/storageClient";
-import { organizationType } from "@/types/organizationType";
+import { OrganizationSchema } from "@/schemas/organization";
+import { JsonObject } from "@prisma/client/runtime/library";
+import { revalidatePath } from "next/cache";
 
 //create organization for first time
 export const OrganizationCreate = async (formData: FormData) => {
@@ -18,7 +16,7 @@ export const OrganizationCreate = async (formData: FormData) => {
     });
     const validateData = OrganizationSchema.safeParse(values);
     if (!validateData.success) {
-      return { message: "Please Chcek your data", variant: "error" };
+      return { message: "😥 Please Chcek your data", variant: "error" };
     }
     const { userId, name, phone, email, description, address, logo } =
       validateData.data;
@@ -32,7 +30,7 @@ export const OrganizationCreate = async (formData: FormData) => {
         .upload(`${userId}_${logo.name}`, logo, {
           cacheControl: "3600",
         });
-      if (error) return { message: "something went wrong", variant: "error" };
+      if (error) return { message: "❌ Something went wrong. please try again", variant: "error" };
 
       //updating logoDetails with uploaded file data
       logoDetails = {
@@ -57,10 +55,10 @@ export const OrganizationCreate = async (formData: FormData) => {
       },
     });
     revalidatePath("/app/profile");
-    return { message: "created succesfully", variant: "success" };
+    return { message: "✅ Changes has been saved", variant: "success" };
   } catch (error) {
     return {
-      message: "something went wrong please try again",
+      message: "❌ Something went wrong please try again",
       variant: "error",
     };
   }
@@ -69,12 +67,18 @@ export const OrganizationCreate = async (formData: FormData) => {
 //update organization
 export const OrganizationUpdate = async ({
   formData,
-  existOrganization,
+  id,
+  prevLogo,
 }: {
   formData: FormData;
-  existOrganization: organizationType;
+  id: string;
+  prevLogo: JsonObject;
 }) => {
   try {
+    // console.log(formData.get("image") as FileList)
+    // for(const img in formData.get("image")){
+    //   console.log(img)
+    // }
     const values: Record<string, any> = {};
     //converting form data to objcet
     formData.forEach((value, key) => {
@@ -84,7 +88,7 @@ export const OrganizationUpdate = async ({
     //validating data
     const validate = OrganizationSchema.safeParse(values);
     if (!validate.success) {
-      return { message: "Please Chcek your data", variant: "error" };
+      return { message: "😥 Please Chcek your data", variant: "error" };
     }
 
     //getting data from validation data
@@ -92,12 +96,12 @@ export const OrganizationUpdate = async ({
       validate.data;
 
     //getting exist organization logo details
-    let logoDetails = existOrganization.logo!;
+    let logoDetails = prevLogo;
 
     //if user change file or upload new one
     if (logo instanceof File) {
       //deleting exist file
-      if (typeof logoDetails === "object" && "path" in logoDetails) {
+      if (typeof logoDetails === "object" && "path" in logoDetails!) {
         await storageClient
           .from("s1-dev")
           .remove([`avatar/${logoDetails.path}`]);
@@ -111,7 +115,7 @@ export const OrganizationUpdate = async ({
         });
 
       //if any error occured
-      if (error) return { message: "something went wrong", variant: "error" };
+      if (error) return { message: "❌ something went wrong. please try again", variant: "error" };
       //updating logoDetails with new uploading data
       logoDetails = {
         src: `https://${
@@ -125,7 +129,7 @@ export const OrganizationUpdate = async ({
     //updating data
     await prisma.organization.update({
       where: {
-        id: existOrganization.id,
+        id: id,
       },
       data: {
         name,
@@ -137,10 +141,10 @@ export const OrganizationUpdate = async ({
       },
     });
     revalidatePath("/app/profile");
-    return { message: "data updated successfully", variant: "success" };
+    return { message: "✅ data updated successfully", variant: "success" };
   } catch (error) {
     return {
-      message: "something went wrong please try again",
+      message: "❌ something went wrong please try again",
       variant: "error",
     };
   }
