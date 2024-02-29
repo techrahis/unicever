@@ -20,7 +20,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
-import storageClient from "@/lib/storageClient";
 import { OrganizationSchema } from "@/schemas/organization";
 import {
   OrganizationCreate,
@@ -28,10 +27,12 @@ import {
 } from "@/server/organization-crud";
 import { organizationType } from "@/types/organizationType";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { JsonObject } from "@prisma/client/runtime/library";
 import { CheckIcon } from "@radix-ui/react-icons";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import DragNDrop from "./drag-drop";
 
 export default function OrganizationCard({
   userId,
@@ -55,53 +56,57 @@ export default function OrganizationCard({
   });
 
   const [isPending, startTransition] = useTransition();
-  const avatar = JSON.parse(organizationDetails?.logo as string);
+  const [files, setFiles] = useState<{ file: File; preview: string }[]>([]);
+  const avatar =
+    typeof organizationDetails?.logo === "string"
+      ? JSON.parse(organizationDetails?.logo)
+      : organizationDetails?.logo;
 
   //create or update organization data
   const onSubmit = async (values: z.infer<typeof OrganizationSchema>) => {
     //getting logo image
-    const logo: File = form.getValues("logo")[0];
-
-    //checking if organization exist or not
-    if (organizationDetails) {
-      //if exist update
-      startTransition(async () => {
-        const { data, error } = await storageClient
-          .from("s1-dev/avatar")
-          .upload(`${userId}-${logo.name}`, logo, {
-            cacheControl: "3600",
-          });
-        console.log(data);
-        const { message, variant } = await OrganizationUpdate({
-          values: { ...values, logo: data },
-          id: organizationDetails.id,
-        });
-
-        toast({
-          title: message,
-          variant: variant === "success" ? "success" : "error",
-        });
-      });
-    } else {
-      //else create
-      startTransition(async () => {
-        const { data, error } = await storageClient
-          .from("s1-dev/avatar")
-          .upload(`${userId}-${logo.name}`, logo, {
-            cacheControl: "3600",
-          });
-        const { message, variant } = await OrganizationCreate({
-          ...values,
-          userId: userId as string,
-          logo: data,
-        });
-
-        toast({
-          title: message,
-          variant: variant === "success" ? "success" : "error",
-        });
-      });
+    const formData = new FormData();
+    const avatar: File = form.getValues("logo")[0];
+    const bgImages = form.getValues("image");
+    const {
+      logo,
+      image,
+      ...details
+    }: {
+      [key: string]: string;
+    } = values;
+    for (const key in details) {
+      formData.append(key, details[key]);
     }
+    formData.append("userId", userId as string);
+    formData.append(
+      "logo",
+      avatar ? avatar : JSON.stringify(form.getValues("logo"))
+    );
+    // for (const fileObj of files) {
+    //   formData.append("image", fileObj.file, fileObj.file.name);
+    // }
+    formData.append("image", bgImages)
+    startTransition(async () => {
+      //checking weather organization exists or not
+      if (organizationDetails) {
+        const { message, variant } = await OrganizationUpdate({
+          formData,
+          id: organizationDetails.id!,
+          prevLogo: organizationDetails.logo as JsonObject,
+        });
+        toast({
+          title: message,
+          variant: variant === "success" ? "success" : "error",
+        });
+      } else {
+        const { message, variant } = await OrganizationCreate(formData);
+        toast({
+          title: message,
+          variant: variant === "success" ? "success" : "error",
+        });
+      }
+    });
   };
 
   return (
@@ -126,13 +131,14 @@ export default function OrganizationCard({
                       <Label htmlFor="logo">Logo</Label>
                       <section className="flex space-x-2 items-center">
                         <Avatar>
-                          <AvatarImage src={avatar.src} />
+                          <AvatarImage src={avatar?.src} />
                           <AvatarFallback className="uppercase font-bold">
                             hk
                           </AvatarFallback>
                         </Avatar>
                         <FormControl>
                           <Input
+                            required={false}
                             id="logo"
                             type="file"
                             {...form.register("logo")}
@@ -232,6 +238,26 @@ export default function OrganizationCard({
                         rows={8}
                         id="description"
                         {...form.register("description")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div>
+              <FormField
+                name="image"
+                render={() => (
+                  <FormItem>
+                    <Label htmlFor="image">Image</Label>
+                    <FormControl>
+                      {/* <DragNDrop files={files} setFiles={setFiles} /> */}
+                      <Input
+                        type="file"
+                        multiple={true}
+                        {...form.register("image")}
+                        id="image"
                       />
                     </FormControl>
                     <FormMessage />
