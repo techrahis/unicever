@@ -56,12 +56,14 @@ export default function OrganizationCard({
   });
 
   const [isPending, startTransition] = useTransition();
-  const [files, setFiles] = useState<{ file: File; preview: string }[]>([]);
+  const savedImages = form.getValues("image");
+  const [files, setFiles] = useState<{ file: File; src: string }[]>(
+    JSON.parse(savedImages)
+  );
   const avatar =
     typeof organizationDetails?.logo === "string"
       ? JSON.parse(organizationDetails?.logo)
       : organizationDetails?.logo;
-
   //create or update organization data
   const onSubmit = async (values: z.infer<typeof OrganizationSchema>) => {
     //getting logo image
@@ -83,10 +85,10 @@ export default function OrganizationCard({
       "logo",
       avatar ? avatar : JSON.stringify(form.getValues("logo"))
     );
-    // for (const fileObj of files) {
-    //   formData.append("image", fileObj.file, fileObj.file.name);
-    // }
-    formData.append("image", bgImages)
+    for (const fileObj of files) {
+      formData.append("image", fileObj.file);
+    }
+    formData.append("image", bgImages);
     startTransition(async () => {
       //checking weather organization exists or not
       if (organizationDetails) {
@@ -252,13 +254,13 @@ export default function OrganizationCard({
                   <FormItem>
                     <Label htmlFor="image">Image</Label>
                     <FormControl>
-                      {/* <DragNDrop files={files} setFiles={setFiles} /> */}
-                      <Input
+                      <DragNDrop files={files} setFiles={setFiles} />
+                      {/* <Input
                         type="file"
                         multiple={true}
                         {...form.register("image")}
                         id="image"
-                      />
+                      /> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>
