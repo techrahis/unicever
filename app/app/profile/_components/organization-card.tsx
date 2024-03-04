@@ -27,12 +27,11 @@ import {
 } from "@/server/organization-crud";
 import { organizationType } from "@/types/organizationType";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { JsonObject } from "@prisma/client/runtime/library";
 import { CheckIcon } from "@radix-ui/react-icons";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import DragNDrop from "./drag-drop";
+import { formatTime } from "./formatTime";
 
 export default function OrganizationCard({
   userId,
@@ -50,62 +49,34 @@ export default function OrganizationCard({
       address: organizationDetails?.address || "",
       phone: organizationDetails?.phone || "",
       email: organizationDetails?.email || "",
-      image: organizationDetails?.image || "",
       logo: organizationDetails?.logo || "",
     },
   });
 
   const [isPending, startTransition] = useTransition();
-  const savedImages = form.getValues("image");
-  const [files, setFiles] = useState<{ file: File; src: string }[]>(
-    JSON.parse(savedImages)
-  );
-  const avatar =
-    typeof organizationDetails?.logo === "string"
-      ? JSON.parse(organizationDetails?.logo)
-      : organizationDetails?.logo;
   //create or update organization data
   const onSubmit = async (values: z.infer<typeof OrganizationSchema>) => {
-    //getting logo image
-    const formData = new FormData();
-    const avatar: File = form.getValues("logo")[0];
-    const bgImages = form.getValues("image");
-    const {
-      logo,
-      image,
-      ...details
-    }: {
-      [key: string]: string;
-    } = values;
-    for (const key in details) {
-      formData.append(key, details[key]);
-    }
-    formData.append("userId", userId as string);
-    formData.append(
-      "logo",
-      avatar ? avatar : JSON.stringify(form.getValues("logo"))
-    );
-    for (const fileObj of files) {
-      formData.append("image", fileObj.file);
-    }
-    formData.append("image", bgImages);
     startTransition(async () => {
       //checking weather organization exists or not
       if (organizationDetails) {
-        const { message, variant } = await OrganizationUpdate({
-          formData,
-          id: organizationDetails.id!,
-          prevLogo: organizationDetails.logo as JsonObject,
-        });
+        const { message, variant } = await OrganizationUpdate(
+          { ...values, userId: userId! },
+          organizationDetails.id!
+        );
         toast({
           title: message,
           variant: variant === "success" ? "success" : "error",
+          description:formatTime(new Date())
         });
       } else {
-        const { message, variant } = await OrganizationCreate(formData);
+        const { message, variant } = await OrganizationCreate({
+          ...values,
+          userId: userId!,
+        });
         toast({
           title: message,
           variant: variant === "success" ? "success" : "error",
+          description:formatTime(new Date())
         });
       }
     });
@@ -133,16 +104,18 @@ export default function OrganizationCard({
                       <Label htmlFor="logo">Logo</Label>
                       <section className="flex space-x-2 items-center">
                         <Avatar>
-                          <AvatarImage src={avatar?.src} />
+                          <AvatarImage src={organizationDetails?.logo!} />
                           <AvatarFallback className="uppercase font-bold">
-                            hk
+                            {organizationDetails?.name
+                              ? organizationDetails.name.split(" ")[0].charAt(0) + 
+                                organizationDetails.name.split(" ")[1].charAt(0)
+                              : ""}
                           </AvatarFallback>
                         </Avatar>
                         <FormControl>
                           <Input
-                            required={false}
                             id="logo"
-                            type="file"
+                            type="url"
                             {...form.register("logo")}
                           />
                         </FormControl>
@@ -241,26 +214,6 @@ export default function OrganizationCard({
                         id="description"
                         {...form.register("description")}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div>
-              <FormField
-                name="image"
-                render={() => (
-                  <FormItem>
-                    <Label htmlFor="image">Image</Label>
-                    <FormControl>
-                      <DragNDrop files={files} setFiles={setFiles} />
-                      {/* <Input
-                        type="file"
-                        multiple={true}
-                        {...form.register("image")}
-                        id="image"
-                      /> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>

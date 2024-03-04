@@ -12,15 +12,5 @@ export const OrganizationSchema = z.object({
   phone: z.string().length(10, { message: "Phone no should be 10 digit" }),
   email: z.string().email({ message: "Please add a valid email" }),
   image: z.any().optional(),
-  logo: z
-    .any()
-    .optional()
-    // .refine(
-    //   (file) => !file || !file[0] || file[0].size <= MAX_SIZE,
-    //   "Logo should be max 250 kb"
-    // )
-    // .refine(
-    //   (file) => !file || !file[0] || allowedExtension.includes(file[0].type),
-    //   "only jpg, jpeg, png are supported"
-    // ),
+  logo: z.string().optional()
 });

@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { CheckIcon } from "@radix-ui/react-icons";
 import { updateAccountAction } from "@/server/profile-update";
 import { useToast } from "@/components/ui/use-toast";
+import { formatTime } from "./formatTime";
 
 type UserProps = {
   id: string | undefined;
@@ -44,59 +45,21 @@ export default function AccountCard({ user }: { user: UserProps }) {
     resolver: zodResolver(AccountSchema),
     defaultValues: {
       id: user?.id || undefined,
-      photo: "",
+      photo: user?.image || "",
       phone: user?.phone || "",
       name: user?.name || "",
     },
   });
 
   const accountAction = (data: z.infer<typeof AccountSchema>) => {
-    const photoFile = form.getValues("photo")[0];
-
-    // date time in format of Friday, 2 April 2021 12:00:00
-
-    const timestamp = new Date().getTime();
-
-    const date = new Date(timestamp);
-
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    };
-
-    const formattedDate = new Intl.DateTimeFormat("en-US", options).format(
-      date
-    );
-
-    if (photoFile instanceof File) {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64String = reader.result as string;
-        const base64Data = base64String.split(",")[1];
-        startTransition(() => {
-          updateAccountAction({ ...data, photo: base64Data }).then((data) => {
-            data?.success &&
-              toast({
-                title: data?.success,
-                description: formattedDate,
-              });
-            data?.error &&
-              toast({
-                title: data?.error,
-                description: formattedDate,
-              });
-          });
-        });
-      };
-      reader.readAsDataURL(photoFile);
-    } else {
-      updateAccountAction(data);
-    }
+    startTransition(async () => {
+      const { message, variant } = await updateAccountAction(data);
+      toast({
+        title: message,
+        variant: variant === "success" ? "success" : "error",
+        description: formatTime(new Date()),
+      });
+    });
   };
 
   return (
@@ -137,9 +100,8 @@ export default function AccountCard({ user }: { user: UserProps }) {
                         <FormControl>
                           <Input
                             id="photo"
-                            defaultValue={"xys"}
                             {...form.register("photo")}
-                            type="file"
+                            type="url"
                           />
                         </FormControl>
                         <FormMessage />
