@@ -9,5 +9,5 @@ export type organizationType = {
     phone:string | null,
     email:string | null,
     image: string | null,
-    logo:Prisma.JsonValue | null,
+    logo:string | null,
 }
