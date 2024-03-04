@@ -55,7 +55,7 @@ model Organization {
   address     String?
   phone       String?
   email       String?
-  image       String?
+  image       Json?
   logo        Json
   events      Event[]
 

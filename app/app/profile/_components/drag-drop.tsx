@@ -8,9 +8,9 @@ import React, { useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 interface DragNDropProps {
-  files: { file: File; preview: string }[];
+  files: { file: File; src: string }[];
   setFiles: React.Dispatch<
-    React.SetStateAction<{ file: File; preview: string }[]>
+    React.SetStateAction<{ file: File; src: string }[]>
   >;
 }
 const DragNDrop: React.FC<DragNDropProps> = ({ files, setFiles }) => {
@@ -22,7 +22,7 @@ const DragNDrop: React.FC<DragNDropProps> = ({ files, setFiles }) => {
       if (files.length + acceptedFiles.length <= 5) {
         const previewFile = acceptedFiles.map((file) => ({
           file,
-          preview: URL.createObjectURL(file),
+          src: URL.createObjectURL(file),
         }));
         // console.log(previewFile)
         setFiles((prev) => [...prev, ...previewFile]);
@@ -35,14 +35,14 @@ const DragNDrop: React.FC<DragNDropProps> = ({ files, setFiles }) => {
   });
 
   useEffect(() => {
-    return () => files.forEach((file) => URL.revokeObjectURL(file.preview));
+    return () => files.forEach((file) => URL.revokeObjectURL(file.src));
   }, [files]);
 
   const removeFile = (preview: string) => {
-    setFiles((prev) => prev.filter((file) => file.preview !== preview));
+    setFiles((prev) => prev.filter((file) => file.src !== preview));
   };
 
-  console.log(files);
+  //console.log(files);
   return (
     <div
       className={cn(
@@ -92,17 +92,17 @@ const DragNDrop: React.FC<DragNDropProps> = ({ files, setFiles }) => {
         <div className="grid grid-cols-3 md:flex gap-4 h-full">
           {files.map((file) => (
             <div
-              key={file.preview}
+              key={file.src}
               className="relative group cursor-pointer mt-2"
             >
               <img
-                src={file?.preview}
+                src={file?.src}
                 alt="orgnization image"
                 className="md:h-full md:w-32 lg:w-auto rounded-md h-20 w-full"
               />
 
               <X
-                onClick={() => removeFile(file.preview)}
+                onClick={() => removeFile(file.src)}
                 className="absolute -top-2 -right-2 z-50 h-6 w-6 p-1 bg-rose-600 rounded-full shadow 
               font-bold  cursor-pointer"
               />

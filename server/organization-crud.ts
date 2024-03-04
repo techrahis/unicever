@@ -3,7 +3,8 @@
 import prisma from "@/lib/prisma";
 import storageClient from "@/lib/storageClient";
 import { OrganizationSchema } from "@/schemas/organization";
-import { JsonObject } from "@prisma/client/runtime/library";
+import { Prisma } from "@prisma/client";
+import { JsonArray, JsonObject } from "@prisma/client/runtime/library";
 import { revalidatePath } from "next/cache";
 
 //create organization for first time
@@ -26,17 +27,21 @@ export const OrganizationCreate = async (formData: FormData) => {
     if (logo instanceof File) {
       //uploading file
       const { data, error } = await storageClient
-        .from("s1-dev/avatar")
+        .from("organization/logo")
         .upload(`${userId}_${logo.name}`, logo, {
           cacheControl: "3600",
         });
-      if (error) return { message: "❌ Something went wrong. please try again", variant: "error" };
+      if (error)
+        return {
+          message: "❌ Something went wrong. please try again",
+          variant: "error",
+        };
 
       //updating logoDetails with uploaded file data
       logoDetails = {
-        src: `https://vlyhguzcuqmgcwvxirun.supabase.co/storage/v1/object/public/${
-          (data as any).fullPath
-        }`,
+        src: `https://${
+          process.env.DATABASE_NAME
+        }.supabase.co/storage/v1/object/public/${(data as any).fullPath}`,
         id: (data as any).id,
         path: data.path,
       };
@@ -75,7 +80,7 @@ export const OrganizationUpdate = async ({
   prevLogo: JsonObject;
 }) => {
   try {
-    // console.log(formData.get("image") as FileList)
+    //console.log(formData.getAll("image"))
     // for(const img in formData.get("image")){
     //   console.log(img)
     // }
@@ -103,19 +108,23 @@ export const OrganizationUpdate = async ({
       //deleting exist file
       if (typeof logoDetails === "object" && "path" in logoDetails!) {
         await storageClient
-          .from("s1-dev")
-          .remove([`avatar/${logoDetails.path}`]);
+          .from("organization")
+          .remove([`logo/${logoDetails.path}`]);
       }
 
       //uploading new one
       const { data, error } = await storageClient
-        .from("s1-dev/avatar")
+        .from("organization/logo")
         .upload(`${userId}_${logo.name}`, logo, {
           cacheControl: "3600",
         });
 
       //if any error occured
-      if (error) return { message: "❌ something went wrong. please try again", variant: "error" };
+      if (error)
+        return {
+          message: "❌ something went wrong. please try again",
+          variant: "error",
+        };
       //updating logoDetails with new uploading data
       logoDetails = {
         src: `https://${
@@ -124,6 +133,45 @@ export const OrganizationUpdate = async ({
         id: (data as any).id,
         path: data.path,
       };
+    }
+
+    const imageDetails = await prisma.organization.findFirst({
+      where: { userId: userId },
+      select: { image: true },
+    });
+    let imageData =
+      imageDetails?.image === "false"
+        ? []
+        : typeof imageDetails?.image === "string"
+        ? JSON.parse(imageDetails.image)
+        : undefined;
+    //getting images if organization uploaded
+    const getAllImages = formData.getAll("image");
+    if (imageData.length + getAllImages.length > 5)
+      return { message: "oops max 5 image can be uploaded", variant: "error" };
+    if (Array.isArray(getAllImages)) {
+      for (const image of getAllImages) {
+        if (image instanceof File) {
+          const { data, error } = await storageClient
+            .from("organization/image")
+            .upload(`${userId}_${image.name}`, image, {
+              cacheControl: "3600",
+            });
+
+          if (error) {
+            throw error;
+            return { message: "something went wrong", variant: "error" };
+          }
+          const newImageData = {
+            src: `https://${
+              process.env.DATABASE_NAME
+            }.supabase.co/storage/v1/object/public/${(data as any).fullPath}`,
+            id: (data as any).id,
+            path: (data as any).path,
+          };
+          imageData = [...imageData, newImageData];
+        }
+      }
     }
 
     //updating data
@@ -137,12 +185,14 @@ export const OrganizationUpdate = async ({
         email,
         description,
         address,
+        image: JSON.stringify(imageData),
         logo: logoDetails!,
       },
     });
     revalidatePath("/app/profile");
     return { message: "✅ data updated successfully", variant: "success" };
   } catch (error) {
+    throw error;
     return {
       message: "❌ something went wrong please try again",
       variant: "error",
