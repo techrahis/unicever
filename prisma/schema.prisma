@@ -56,7 +56,7 @@ model Organization {
   phone       String?
   email       String?
   image       Json?
-  logo        Json
+  logo        String?
   events      Event[]
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
