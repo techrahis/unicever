@@ -1,17 +1,16 @@
 import { auth } from "@/auth";
-import { Button, buttonVariants } from "@/components/ui/button";
-import * as uuid from "uuid";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
 import { getOrganization } from "@/server/organization-crud";
 import Link from "next/link";
+import * as uuid from "uuid";
 export default async function Page() {
   const session = await auth();
   const organization = await getOrganization(session?.user.id!);
