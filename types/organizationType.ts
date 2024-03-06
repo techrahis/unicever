@@ -8,6 +8,6 @@ export type organizationType = {
     address:string | null,
     phone:string | null,
     email:string | null,
-    image: string | null,
+    image: Prisma.JsonValue | null,
     logo:string | null,
 }
