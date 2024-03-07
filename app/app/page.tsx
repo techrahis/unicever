@@ -50,13 +50,13 @@ export default async function Page() {
                 <CardFooter className="flex items-center gap-2">
                   <Link
                     href={`/app/event/${event.id}`}
-                    className={buttonVariants({variant:"link"})}
+                    className={buttonVariants({variant:"secondary"})}
                   >
                     Manage
                   </Link>
                   <Link
                     href={`/app/create-event/${event.id}`}
-                    className={buttonVariants({variant:"link"})}
+                    className={buttonVariants({variant:"outline"})}
                   >
                     Edit
                   </Link>
