@@ -78,8 +78,7 @@ model Student {
   id          String  @id @default(cuid())
   name        String
   regNo       String
-  description String?
-  image       String?
+  certificate String
   Event       Event?  @relation(fields: [eventId], references: [id])
   eventId     String?
 }
