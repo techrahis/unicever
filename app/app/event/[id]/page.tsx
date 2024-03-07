@@ -2,9 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getEventById } from "@/server/event-create";
 import React from "react";
 import AddCertificate from "../_components/AddCertificate";
+import { getStudentsByEventId } from "@/server/add-student";
 
 const EventDetails = async ({ params }: { params: { id: string } }) => {
   const event = await getEventById(params.id);
+  const studentsByEvent = await getStudentsByEventId(event?.id!);
   return (
     <div>
       <Card>
@@ -18,7 +20,7 @@ const EventDetails = async ({ params }: { params: { id: string } }) => {
 
         <CardContent>
           <p className="text-sm">{event?.description}</p>
-          <AddCertificate />
+          <AddCertificate eventId={event?.id} studentsData={studentsByEvent} />
         </CardContent>
       </Card>
     </div>
