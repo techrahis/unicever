@@ -3,12 +3,14 @@ import { getEventById } from "@/server/event-create";
 import React from "react";
 import AddCertificate from "../_components/AddCertificate";
 import { getStudentsByEventId } from "@/server/add-student";
+import BackButton from "../../_components/BackButton";
 
 const EventDetails = async ({ params }: { params: { id: string } }) => {
   const event = await getEventById(params.id);
   const studentsByEvent = await getStudentsByEventId(event?.id!);
   return (
     <div>
+      <BackButton />
       <Card>
         <CardHeader>
           <CardTitle>{event?.title}</CardTitle>
