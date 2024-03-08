@@ -11,10 +11,14 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { student, studentSchema } from "@/schemas/student";
-import { addCertificate } from "@/server/add-student";
+import {
+  certificateCrud,
+  deleteStudentById,
+  getStudentById
+} from "@/server/add-student";
 import { studentType } from "@/types/studentType";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, Trash2 } from "lucide-react";
+import { Eye } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -41,7 +45,7 @@ const AddCertificate = ({
     },
   });
   const [isPending, startTransition] = useTransition();
-  const [currentIndex, setCurrentIndex] = useState<number|null>(null);
+  const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "student",
@@ -49,16 +53,39 @@ const AddCertificate = ({
 
   const onSubmit = (values: z.infer<typeof student>) => {
     const formData = new FormData();
-    formData.append("certificate", values.certificate[0]);
+    formData.append(
+      "certificate",
+      values.certificate[0] instanceof File
+        ? values.certificate[0]
+        : values.certificate
+    );
     startTransition(async () => {
-      const {message} = await addCertificate({ ...values, certificate: formData });
+      const { message } = await certificateCrud({
+        ...values,
+        certificate: formData,
+      });
       toast({
-        title:"✅ "+message,
-        description:new Date().toISOString()
-      })
+        title: message,
+        description: new Date().toISOString(),
+      });
     });
   };
 
+  const deleteStudent = (index: number) => {
+    startTransition(async () => {
+      const isExist = await getStudentById(studentsData?.[index]?.id as string);
+      if (isExist) {
+        const { message } = await deleteStudentById(
+          studentsData?.[index]?.id as string
+        );
+        toast({
+          title: message,
+          description: new Date().toISOString(),
+        });
+      }
+    });
+    remove(index)
+  };
   return (
     <div className="mt-4 flex flex-col space-y-4">
       {fields.map((field, index) => (
@@ -145,11 +172,23 @@ const AddCertificate = ({
                     <Eye />
                   </Link>
                 )}
-                <Button type="submit" disabled={isPending && currentIndex===index}>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isPending && currentIndex === index}
+                >
                   Save
                 </Button>
-                <div onClick={() => remove(index)} className={buttonVariants()}>
-                  <Trash2 />
+                <div
+                  onClick={() => deleteStudent(index)}
+                  className={buttonVariants({
+                    variant:"destructive",
+                    className: `${
+                      isPending && currentIndex === index
+                    } ? "opacity-50":"" cursor-pointer w-full`,
+                  })}
+                >
+                  Delete
                 </div>
               </div>
             </div>
@@ -158,6 +197,7 @@ const AddCertificate = ({
       ))}
       <Button
         className="w-fit"
+        variant="link"
         onClick={() => {
           append({
             id: uuid4(),
