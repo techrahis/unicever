@@ -15,7 +15,7 @@ export const student = z.object({
           (value[0].size <= MAX_SIZE && value[0].type === "application/pdf")
         );
       },
-      { message: "Invalid certificate field" }
+      { message: "File is invalid" }
     )
   ),
 });
