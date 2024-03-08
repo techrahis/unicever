@@ -38,7 +38,7 @@ export default async function Page() {
                 <CardHeader>
                   <CardTitle>{event.title}</CardTitle>
                   <div className="text-[0.8rem] text-muted-foreground flex justify-between items-center">
-                    <p>{event.location}</p>
+                    <p className="text-primary">{event.location}</p>
                     <p>{event.date.toLocaleDateString()}</p>
                   </div>
                 </CardHeader>
