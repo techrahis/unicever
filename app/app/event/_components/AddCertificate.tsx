@@ -14,7 +14,7 @@ import { student, studentSchema } from "@/schemas/student";
 import {
   certificateCrud,
   deleteStudentById,
-  getStudentById
+  getStudentById,
 } from "@/server/add-student";
 import { studentType } from "@/types/studentType";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,6 +24,7 @@ import { useState, useTransition } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { v4 as uuid4 } from "uuid";
 import { z } from "zod";
+import { formatTime } from "../../profile/_components/formatTime";
 const AddCertificate = ({
   eventId,
   studentsData,
@@ -44,14 +45,20 @@ const AddCertificate = ({
         })) || [],
     },
   });
-  const [isPending, startTransition] = useTransition();
-  const [currentIndex, setCurrentIndex] = useState<number | null>(null);
+  const [isSavePending, startSaveTransition] = useTransition();
+  const [isDeletePending, startDeleteTransition] = useTransition();
+  const [currentIndex, setCurrentIndex] = useState<number | null>(1);
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "student",
   });
 
   const onSubmit = (values: z.infer<typeof student>) => {
+    if (isSavePending)
+      return toast({
+        title: "Only one at a time",
+        description: formatTime(new Date()),
+      });
     const formData = new FormData();
     formData.append(
       "certificate",
@@ -59,32 +66,32 @@ const AddCertificate = ({
         ? values.certificate[0]
         : values.certificate
     );
-    startTransition(async () => {
+    startSaveTransition(async () => {
       const { message } = await certificateCrud({
         ...values,
         certificate: formData,
       });
       toast({
         title: message,
-        description: new Date().toISOString(),
+        description: formatTime(new Date()),
       });
     });
   };
 
-  const deleteStudent = (index: number) => {
-    startTransition(async () => {
-      const isExist = await getStudentById(studentsData?.[index]?.id as string);
-      if (isExist) {
+  const deleteStudent =  (index: number) => {
+    const isExist = fields[index].certificate;
+    if (isExist) {
+      startDeleteTransition(async () => {
         const { message } = await deleteStudentById(
           studentsData?.[index]?.id as string
         );
         toast({
           title: message,
-          description: new Date().toISOString(),
+          description: formatTime(new Date()),
         });
-      }
-    });
-    remove(index)
+      });
+    }
+    remove(index);
   };
   return (
     <div className="mt-4 flex flex-col space-y-4">
@@ -94,7 +101,7 @@ const AddCertificate = ({
             onSubmit={form.handleSubmit(() => {
               const formData = form.getValues().student[index];
               onSubmit(formData);
-              setCurrentIndex(index);
+              if (!isSavePending) setCurrentIndex(index);
             })}
             encType="multipart/form-data"
           >
@@ -175,17 +182,22 @@ const AddCertificate = ({
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isPending && currentIndex === index}
+                  disabled={isSavePending && currentIndex === index}
                 >
                   Save
                 </Button>
                 <div
-                  onClick={() => deleteStudent(index)}
+                  onClick={() => {
+                    setCurrentIndex(index);
+                    deleteStudent(index);
+                  }}
                   className={buttonVariants({
-                    variant:"destructive",
+                    variant: "destructive",
                     className: `${
-                      isPending && currentIndex === index
-                    } ? "opacity-50":"" cursor-pointer w-full`,
+                      isDeletePending && currentIndex == index
+                        ? "opacity-60 pointer-events-none"
+                        : ""
+                    } cursor-pointer w-full`,
                   })}
                 >
                   Delete

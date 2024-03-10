@@ -116,9 +116,9 @@ export const getStudentsByEventId = async (eventId: string) => {
       where: {
         eventId: eventId,
       },
-      orderBy:{
-        createdAt:"asc"
-      }
+      orderBy: {
+        createdAt: "asc",
+      },
     });
     return data;
   } catch (error) {
@@ -145,6 +145,10 @@ export const getStudentById = async (id: string) => {
 //deleting student based on id
 export const deleteStudentById = async (id: string) => {
   try {
+    const findStudent = await getStudentById(id);
+    await storageClient
+      .from("organization")
+      .remove([`image/${findStudent?.certificate.split("/")[2]}`]);
     await prisma.student.delete({
       where: { id: id },
     });
