@@ -176,8 +176,8 @@ export default function AccountCard({ user }: { user: UserProps }) {
           />
           <CardFooter>
             <Button disabled={isPending} type="submit">
-              {isPending ? (
-                <div className="flex gap-2 items-center">
+              <div className="flex gap-2 items-center">
+                {isPending ? (
                   <svg
                     aria-hidden="true"
                     className="inline w-5 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300"
@@ -194,14 +194,11 @@ export default function AccountCard({ user }: { user: UserProps }) {
                       fill="currentFill"
                     />
                   </svg>
-                  <p>Saving data</p>
-                </div>
-              ) : (
-                <div className="flex gap-1 items-center">
-                  <CheckIcon className="w-4 h-4 mr-2" />
-                  Save Changes
-                </div>
-              )}
+                ) : (
+                  <CheckIcon className="w-4 h-4" />
+                )}
+                Save Changes
+              </div>
             </Button>
           </CardFooter>
         </form>

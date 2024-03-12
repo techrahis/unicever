@@ -76,7 +76,7 @@ const CreateEvent = ({
     <div>
       <Card>
         <CardHeader>
-          <CardTitle>Create New Event</CardTitle>
+          <CardTitle>Create or Edit Your Event</CardTitle>
           <CardDescription>
             Please provide some details about event name, location, date etc.
           </CardDescription>

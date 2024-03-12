@@ -143,7 +143,7 @@ export const getStudentById = async (id: string) => {
 };
 
 //deleting student based on id
-export const deleteStudentById = async (id: string) => {
+export const deleteStudentById = async (id: string, eventId:string) => {
   try {
     const findStudent = await getStudentById(id);
     await storageClient
@@ -152,6 +152,7 @@ export const deleteStudentById = async (id: string) => {
     await prisma.student.delete({
       where: { id: id },
     });
+    revalidatePath(`/app/event/${eventId}`);
     return { message: "successfully deleted", variant: "success" };
   } catch (error) {
     return { message: "please try again", variant: "error" };
