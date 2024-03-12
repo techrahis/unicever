@@ -11,14 +11,10 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { student, studentSchema } from "@/schemas/student";
-import {
-  certificateCrud,
-  deleteStudentById,
-  getStudentById,
-} from "@/server/add-student";
+import { certificateCrud, deleteStudentById } from "@/server/add-student";
 import { studentType } from "@/types/studentType";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye } from "lucide-react";
+import { Eye, ListPlus, X } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -78,20 +74,18 @@ const AddCertificate = ({
     });
   };
 
-  const deleteStudent =  (index: number) => {
-    const isExist = fields[index].certificate;
-    if (isExist) {
-      startDeleteTransition(async () => {
-        const { message } = await deleteStudentById(
-          studentsData?.[index]?.id as string
-        );
-        toast({
-          title: message,
-          description: formatTime(new Date()),
-        });
+  const deleteStudent = (index: number) => {
+    startDeleteTransition(async () => {
+      const { message } = await deleteStudentById(
+        studentsData?.[index]?.id as string,
+        eventId as string
+      );
+      toast({
+        title: message,
+        description: formatTime(new Date()),
       });
-    }
-    remove(index);
+      remove(index);
+    });
   };
   return (
     <div className="mt-4 flex flex-col space-y-4">
@@ -105,9 +99,17 @@ const AddCertificate = ({
             })}
             encType="multipart/form-data"
           >
-            <h1 className="text-sm my-4 text-muted-foreground">
-              # Student - {index + 1}
-            </h1>
+            <div className="flex gap-2 items-center">
+              <h1 className="text-sm my-4 text-muted-foreground"># Student - {index + 1}</h1>
+              {typeof studentsData?.[index]?.certificate === "string" && (
+                <Link
+                  href={`https://zhazktxebwicfwgtzlsi.supabase.co/storage/v1/object/public/${studentsData?.[index]?.certificate}`}
+                  target="_blank"
+                >
+                  <Eye className="h-4 w-4 text-indigo-700 " />
+                </Link>
+              )}
+            </div>
             <div className="grid lg:grid-cols-4 gap-4 w-full">
               <div className="w-full space-y-1">
                 <FormField
@@ -167,18 +169,6 @@ const AddCertificate = ({
                 />
               </div>
               <div className="flex gap-4 w-full">
-                {typeof studentsData?.[index]?.certificate === "string" && (
-                  <Link
-                    className={buttonVariants({
-                      variant: "link",
-                      className: "text-indigo-800",
-                    })}
-                    href={`https://zhazktxebwicfwgtzlsi.supabase.co/storage/v1/object/public/${studentsData?.[index]?.certificate}`}
-                    target="_blank"
-                  >
-                    <Eye />
-                  </Link>
-                )}
                 <Button
                   type="submit"
                   className="w-full"
@@ -186,22 +176,29 @@ const AddCertificate = ({
                 >
                   Save
                 </Button>
-                <div
-                  onClick={() => {
-                    setCurrentIndex(index);
-                    deleteStudent(index);
-                  }}
-                  className={buttonVariants({
-                    variant: "destructive",
-                    className: `${
-                      isDeletePending && currentIndex == index
-                        ? "opacity-60 pointer-events-none"
-                        : ""
-                    } cursor-pointer w-full`,
-                  })}
-                >
-                  Delete
-                </div>
+                {!studentsData?.[index]?.certificate ? (
+                  <Button
+                    type="button"
+                    className="w-full"
+                    variant="destructive"
+                    onClick={() => remove(index)}
+                  >
+                    Cancel
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    className="w-full"
+                    variant="destructive"
+                    disabled={isDeletePending && currentIndex === index}
+                    onClick={() => {
+                      setCurrentIndex(index);
+                      deleteStudent(index);
+                    }}
+                  >
+                    Delete
+                  </Button>
+                )}
               </div>
             </div>
           </form>
@@ -209,7 +206,7 @@ const AddCertificate = ({
       ))}
       <Button
         className="w-fit"
-        variant="link"
+        variant="ghost"
         onClick={() => {
           append({
             id: uuid4(),
@@ -220,7 +217,8 @@ const AddCertificate = ({
           });
         }}
       >
-        Add new
+        <ListPlus className="w-5 h-5 mr-2" />
+        Add New
       </Button>
     </div>
   );
