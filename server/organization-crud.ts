@@ -6,7 +6,9 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 //create organization for first time
-export const OrganizationCreate = async (values: z.infer<typeof OrganizationSchema>) => {
+export const OrganizationCreate = async (
+  values: z.infer<typeof OrganizationSchema>
+) => {
   try {
     const validateData = OrganizationSchema.safeParse(values);
     if (!validateData.success) {
