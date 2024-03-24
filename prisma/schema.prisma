@@ -49,7 +49,7 @@ model Account {
 
 model Organization {
   id          String  @id @default(cuid())
-  userId      String @unique
+  userId      String  @unique
   name        String
   description String?
   address     String?
@@ -75,11 +75,11 @@ model Event {
 }
 
 model Student {
-  id          String  @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
   regNo       String
   certificate String
-  Event       Event?  @relation(fields: [eventId], references: [id])
+  Event       Event?   @relation(fields: [eventId], references: [id])
   eventId     String?
-  createdAt DateTime @default(now())
+  createdAt   DateTime @default(now())
 }

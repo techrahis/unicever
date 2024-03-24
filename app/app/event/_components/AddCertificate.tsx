@@ -100,7 +100,9 @@ const AddCertificate = ({
             encType="multipart/form-data"
           >
             <div className="flex gap-2 items-center">
-              <h1 className="text-sm my-4 text-muted-foreground"># Student - {index + 1}</h1>
+              <h1 className="text-sm my-4 text-muted-foreground">
+                # Student - {index + 1}
+              </h1>
               {typeof studentsData?.[index]?.certificate === "string" && (
                 <Link
                   href={`https://zhazktxebwicfwgtzlsi.supabase.co/storage/v1/object/public/${studentsData?.[index]?.certificate}`}
