@@ -71,7 +71,7 @@ model Event {
   image          String?
   Organization   Organization? @relation(fields: [organizationId], references: [id])
   organizationId String?
-  students       Certificate[]
+  certificates    Certificate[]
 }
 
 model Certificate {
@@ -79,7 +79,8 @@ model Certificate {
   name        String
   studentId   String
   certificateData Json
-  Event       Event?   @relation(fields: [eventId], references: [id])
-  eventId     String?
+  verifyUrl String
+  Event       Event   @relation(fields: [eventId], references: [id])
+  eventId     String
   createdAt   DateTime @default(now())
 }
