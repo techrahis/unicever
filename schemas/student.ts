@@ -1,21 +1,34 @@
 import { z } from "zod";
 const MAX_SIZE = 1000000;
+
+export const CertificateTypeSchema = z.object({
+  id: z.string().min(2),
+  path: z.string().min(2),
+  src: z.string().min(2),
+});
+
 export const student = z.object({
   id: z.string(),
   eventId: z.string(),
   name: z.string().min(1, { message: "please enter student name" }),
-  regNo: z.string().min(1, { message: "please enter registration no" }),
+  studentId: z.string().min(1, { message: "please enter registration no" }),
   certificate: z.lazy(() =>
-    z.any().refine(
+    CertificateTypeSchema.refine(
       (value) => {
-        if (typeof value === "string") return value.trim().length > 0;
-        return (
-          !value ||
-          !value[0] ||
-          (value[0].size <= MAX_SIZE && value[0].type === "application/pdf")
-        );
+        return CertificateTypeSchema.safeParse(value).success;
       },
-      { message: "File is invalid" }
+      { message: "File is required" }
+    ).or(
+      z.any().refine(
+        (value) => {
+          return (
+            value instanceof File &&
+            value.size <= MAX_SIZE &&
+            value.type === "application/pdf"
+          );
+        },
+        { message: "File is invalid" }
+      )
     )
   ),
 });

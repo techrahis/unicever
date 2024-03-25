@@ -2,6 +2,8 @@
 import prisma from "@/lib/prisma";
 import storageClient from "@/lib/storageClient";
 import { student } from "@/schemas/student";
+import { certificateType } from "@/types/studentType";
+import { JsonValue } from "@prisma/client/runtime/library";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -10,7 +12,10 @@ export const certificateCrud = async (values: z.infer<typeof student>) => {
     //validating data
     const validate = student.safeParse({
       ...values,
-      certificate: values.certificate.get("certificate"),
+      certificate:
+        values.certificate instanceof FormData
+          ? values.certificate.get("certificate")
+          : values.certificate,
     });
 
     if (!validate.success) {
@@ -25,7 +30,7 @@ export const certificateCrud = async (values: z.infer<typeof student>) => {
     if (findExistStudent) {
       const { message } = await updateStudentData(
         validate.data,
-        findExistStudent.certificate
+        findExistStudent.certificateData
       );
       return { message };
     }
@@ -33,6 +38,7 @@ export const certificateCrud = async (values: z.infer<typeof student>) => {
     const { message } = await addCertificate(validate.data);
     return { message };
   } catch (error) {
+    //throw error
     return { message: "something went wrong", variant: "error" };
   }
 };
@@ -40,21 +46,29 @@ export const certificateCrud = async (values: z.infer<typeof student>) => {
 //adding new student
 export const addCertificate = async (values: z.infer<typeof student>) => {
   try {
-    const { id, name, regNo, certificate, eventId } = values;
+    const { id, name, studentId, certificate, eventId } = values;
+    console.log(certificate);
     //uploading to supabase
     const { data, error } = await storageClient
       .from("organization/image")
-      .upload(`${eventId}_${regNo}_${certificate.name}`, certificate, {
+      .upload(`${eventId}_${studentId}_${certificate.name}`, certificate, {
         cacheControl: "3600",
       });
     if (error) return { message: "something went wrong", variant: "error" };
     //creating new student
-    await prisma.student.create({
+    const certificateDetails = {
+      id: (data as any)?.id,
+      src: `https://${
+        process.env.DATABASE_NAME
+      }.supabase.co/storage/v1/object/public/${(data as any).fullPath}`,
+      path: data.path,
+    };
+    await prisma.certificate.create({
       data: {
         id,
         name,
-        regNo,
-        certificate: (data as any)?.fullPath,
+        studentId,
+        certificateData: certificateDetails,
         eventId,
       },
     });
@@ -62,6 +76,7 @@ export const addCertificate = async (values: z.infer<typeof student>) => {
     revalidatePath(`/app/event/${eventId}`);
     return { message: "Successfully added", variant: "success" };
   } catch (error) {
+    //throw error;
     return { message: "Something went wrong", variant: "error" };
   }
 };
@@ -69,34 +84,43 @@ export const addCertificate = async (values: z.infer<typeof student>) => {
 //update student data
 export const updateStudentData = async (
   values: z.infer<typeof student>,
-  existCertificate: string
+  existCertificate: JsonValue
 ) => {
   try {
-    const { id, name, regNo, certificate, eventId } = values;
+    const { id, name, studentId, certificate, eventId } = values;
     let newCertificate = existCertificate;
     //chcking certificate is file or not
     if (certificate instanceof File) {
+      await storageClient
+        .from("organization")
+        .remove([`image/${(existCertificate as certificateType)?.path}`]);
       //if file update file
       const { data, error } = await storageClient
         .from("organization")
-        .update(`image/${existCertificate.split("/")[2]}`, certificate, {
+        .upload(`${eventId}_${studentId}_${certificate.name}`, certificate, {
           cacheControl: "3600",
-          upsert: true,
         });
       if (error) return { message: "something went wrong", variant: "error" };
-      newCertificate = (data as any)?.fullPath;
+      console.log(data);
+      newCertificate = {
+        id: (data as any)?.id,
+        src: `https://${
+          process.env.DATABASE_NAME
+        }.supabase.co/storage/v1/object/public/${(data as any).fullPath}`,
+        path: data.path,
+      };
     }
 
     //updating data
-    await prisma.student.update({
+    await prisma.certificate.update({
       where: {
         id: id,
       },
       data: {
         id,
         name,
-        regNo,
-        certificate: newCertificate,
+        studentId,
+        certificateData: newCertificate!,
         eventId,
       },
     });
@@ -105,6 +129,7 @@ export const updateStudentData = async (
     revalidatePath(`/app/event/${eventId}`);
     return { message: "Successfully updated", variant: "success" };
   } catch (error) {
+    //throw error;
     return { message: "something went wrong", variant: "error" };
   }
 };
@@ -112,7 +137,7 @@ export const updateStudentData = async (
 //get students based on event id
 export const getStudentsByEventId = async (eventId: string) => {
   try {
-    const data = await prisma.student.findMany({
+    const data = await prisma.certificate.findMany({
       where: {
         eventId: eventId,
       },
@@ -129,7 +154,7 @@ export const getStudentsByEventId = async (eventId: string) => {
 //get student based on id
 export const getStudentById = async (id: string) => {
   try {
-    const studentData = await prisma.student.findUnique({
+    const studentData = await prisma.certificate.findUnique({
       where: {
         id,
       },
@@ -143,15 +168,18 @@ export const getStudentById = async (id: string) => {
 };
 
 //deleting student based on id
-export const deleteStudentById = async (id: string, eventId:string) => {
+export const deleteStudentById = async (id: string, eventId: string) => {
   try {
     const findStudent = await getStudentById(id);
     await storageClient
       .from("organization")
-      .remove([`image/${findStudent?.certificate.split("/")[2]}`]);
-    await prisma.student.delete({
+      .remove([
+        `image/${(findStudent?.certificateData as certificateType)?.path}`,
+      ]);
+    await prisma.certificate.delete({
       where: { id: id },
     });
+
     revalidatePath(`/app/event/${eventId}`);
     return { message: "successfully deleted", variant: "success" };
   } catch (error) {

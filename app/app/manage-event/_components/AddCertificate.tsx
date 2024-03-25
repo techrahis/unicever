@@ -1,5 +1,5 @@
 "use client";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -10,11 +10,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
-import { student, studentSchema } from "@/schemas/student";
+import {
+  student,
+  studentSchema
+} from "@/schemas/student";
 import { certificateCrud, deleteStudentById } from "@/server/add-student";
-import { studentType } from "@/types/studentType";
+import { certificateType, studentType } from "@/types/studentType";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, ListPlus, X } from "lucide-react";
+import { Eye, ListPlus } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -36,8 +39,8 @@ const AddCertificate = ({
           id: item.id || undefined,
           eventId: item.eventId || undefined,
           name: item.name || undefined,
-          regNo: item.regNo || undefined,
-          certificate: item.certificate || undefined,
+          studentId: item.studentId || undefined,
+          certificate: item.certificateData || undefined,
         })) || [],
     },
   });
@@ -50,22 +53,23 @@ const AddCertificate = ({
   });
 
   const onSubmit = (values: z.infer<typeof student>) => {
+    console.log(values);
     if (isSavePending)
       return toast({
         title: "Only one at a time",
         description: formatTime(new Date()),
       });
     const formData = new FormData();
-    formData.append(
-      "certificate",
-      values.certificate[0] instanceof File
-        ? values.certificate[0]
-        : values.certificate
-    );
+    if (values.certificate instanceof File) {
+      formData.append("certificate", values.certificate);
+    }
     startSaveTransition(async () => {
       const { message } = await certificateCrud({
         ...values,
-        certificate: formData,
+        certificate:
+          values.certificate instanceof File
+            ? formData
+            : values.certificate,
       });
       toast({
         title: message,
@@ -103,9 +107,12 @@ const AddCertificate = ({
               <h1 className="text-sm my-4 text-muted-foreground">
                 # Student - {index + 1}
               </h1>
-              {typeof studentsData?.[index]?.certificate === "string" && (
+              {(studentsData?.[index]?.certificateData as certificateType) && (
                 <Link
-                  href={`https://zhazktxebwicfwgtzlsi.supabase.co/storage/v1/object/public/${studentsData?.[index]?.certificate}`}
+                  href={`${
+                    (studentsData?.[index]?.certificateData as certificateType)
+                      ?.src
+                  }`}
                   target="_blank"
                 >
                   <Eye className="h-4 w-4 text-indigo-700 " />
@@ -124,6 +131,7 @@ const AddCertificate = ({
                           type="text"
                           className={cn({ "lg:my-auto": fieldState.error })}
                           {...form.register(`student.${index}.name`)}
+                          placeholder="e.g student name..."
                         />
                       </FormControl>
                       {form?.formState?.errors?.student?.[index]?.name && (
@@ -136,7 +144,7 @@ const AddCertificate = ({
 
               <div className="w-full space-y-1">
                 <FormField
-                  name={`student.${index}.regNo`}
+                  name={`student.${index}.studentId`}
                   control={form.control}
                   render={({ fieldState }) => (
                     <FormItem>
@@ -144,7 +152,8 @@ const AddCertificate = ({
                         <Input
                           type="text"
                           className={cn({ "lg:my-auto": fieldState.error })}
-                          {...form.register(`student.${index}.regNo`)}
+                          {...form.register(`student.${index}.studentId`)}
+                          placeholder="e.g student id..."
                         />
                       </FormControl>
                       <FormMessage />
@@ -157,12 +166,18 @@ const AddCertificate = ({
                 <FormField
                   name={`student.${index}.certificate`}
                   control={form.control}
-                  render={() => (
+                  render={({ field }) => (
                     <FormItem>
                       <FormControl>
                         <Input
                           type="file"
-                          {...form.register(`student.${index}.certificate`)}
+                          onChange={(event) => {
+                            const fileList = event.target.files;
+                            if (fileList && fileList.length > 0) {
+                              const firstFile = fileList[0];
+                              field.onChange(firstFile);
+                            }
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -178,7 +193,7 @@ const AddCertificate = ({
                 >
                   Save
                 </Button>
-                {!studentsData?.[index]?.certificate ? (
+                {!studentsData?.[index]?.certificateData ? (
                   <Button
                     type="button"
                     className="w-full"
@@ -214,8 +229,8 @@ const AddCertificate = ({
             id: uuid4(),
             eventId: eventId as string,
             name: "",
-            regNo: "",
-            certificate: "",
+            studentId: "",
+            certificate: null,
           });
         }}
       >
