@@ -27,7 +27,7 @@ export default async function Page() {
     <div>
       <div className="flex justify-end my-4 items-center">
         <Link
-          href={`/app/create-event/${uuid.v4()}`}
+          href={`/app/events/${uuid.v4()}`}
           className={buttonVariants({
             variant: "secondary",
           })}
@@ -54,13 +54,13 @@ export default async function Page() {
               </CardContent>
               <CardFooter className="flex items-center gap-2">
                 <Link
-                  href={`/app/event/${event.id}`}
+                  href={`/app/manage-event/${event.id}`}
                   className={buttonVariants({ variant: "secondary" })}
                 >
                   Manage
                 </Link>
                 <Link
-                  href={`/app/create-event/${event.id}`}
+                  href={`/app/events/${event.id}`}
                   className={buttonVariants({ variant: "outline" })}
                 >
                   Edit
