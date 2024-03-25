@@ -12,6 +12,7 @@ import { getOrganization } from "@/server/organization-crud";
 import Link from "next/link";
 import * as uuid from "uuid";
 import NoOrganization from "./_components/NoOrganization";
+import EmptyEvent from "./_components/EmptyEvent";
 export default async function Page() {
   const session = await auth();
   const organization = await getOrganization(session?.user.id!);
@@ -70,7 +71,7 @@ export default async function Page() {
           ))}
         </div>
       ) : (
-        ""
+        <EmptyEvent />
       )}
     </div>
   );

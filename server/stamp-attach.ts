@@ -1,31 +1,27 @@
-const { PDFDocument, StandardFonts, rgb, degrees } = require("pdf-lib");
-const fs = require("fs");
-
+import { PDFDocument, StandardFonts, rgb, degrees } from "pdf-lib";
 // Replace with your actual file paths
-const inputFilePath = "./test.pdf";
-const outputFilePath = "./your_stamped_pdf.pdf";
+// const inputFilePath = "./test.pdf";
+// const outputFilePath = "./your_stamped_pdf.pdf";
 
-const stampText =
-  "Verifiable at: https://chat.openai.com/c/d5805a03-fdf-4c56-dfd-sdfsdggkasdf34324";
-const verifiableText = "Verified by Unicever";
-const fontSize = 10;
-const fontColor = rgb(1, 1, 1); // White color for the text
-const bgColor = rgb(30 / 255, 58 / 255, 138 / 255); // Background color #1E3A8A
-const bgColor2 = rgb(1 / 255, 92 / 255, 45 / 255); // Background color #1E3A8A
-const bottomMargin = 10;
-const rightMargin = 30;
-const leftMargin = 30;
-
-(async () => {
-  const existingPdfBytes = await fs.readFileSync(inputFilePath);
-  const pdfDoc = await PDFDocument.load(existingPdfBytes);
+export const verifyPdf = async (pdfFile: File, stampLink: string) => {
+  const verifiableText = "Verified by Unicever";
+  const fontSize = 10;
+  const fontColor = rgb(1, 1, 1); // White color for the text
+  const bgColor = rgb(30 / 255, 58 / 255, 138 / 255); // Background color #1E3A8A
+  const bgColor2 = rgb(1 / 255, 92 / 255, 45 / 255); // Background color #1E3A8A
+  const bottomMargin = 10;
+  const rightMargin = 30;
+  const leftMargin = 30;
+  const bytes = await pdfFile.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+  const pdfDoc = await PDFDocument.load(buffer);
 
   const page = pdfDoc.getPage(0); // Assuming you want to stamp the first page
 
   const font = await pdfDoc.embedFont(StandardFonts.TimesRoman);
 
   // Calculate the text width
-  const textWidth = font.widthOfTextAtSize(stampText, fontSize);
+  const textWidth = font.widthOfTextAtSize(stampLink, fontSize);
 
   // Calculate the text width
   const textWidth2 = font.widthOfTextAtSize(verifiableText, fontSize);
@@ -61,7 +57,7 @@ const leftMargin = 30;
   });
 
   // Draw the text on top of the background rectangle
-  page.drawText(stampText, {
+  page.drawText(stampLink, {
     x: xPosition,
     y: yPosition,
     size: fontSize,
@@ -79,7 +75,8 @@ const leftMargin = 30;
   });
 
   const modifiedPdfBytes = await pdfDoc.save();
-  await fs.writeFileSync(outputFilePath, modifiedPdfBytes);
-
-  console.log("PDF stamped successfully!");
-})();
+  const blob = new Blob([modifiedPdfBytes], { type: "application/pdf" });
+  const formData = new FormData();
+  formData.append("file", blob);
+  return formData;
+};

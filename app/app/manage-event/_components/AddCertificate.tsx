@@ -53,7 +53,6 @@ const AddCertificate = ({
   });
 
   const onSubmit = (values: z.infer<typeof student>) => {
-    console.log(values);
     if (isSavePending)
       return toast({
         title: "Only one at a time",
