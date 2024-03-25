@@ -6,6 +6,7 @@ import { certificateType } from "@/types/studentType";
 import { JsonValue } from "@prisma/client/runtime/library";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { verifyPdf } from "./stamp-attach";
 
 export const certificateCrud = async (values: z.infer<typeof student>) => {
   try {
@@ -30,7 +31,8 @@ export const certificateCrud = async (values: z.infer<typeof student>) => {
     if (findExistStudent) {
       const { message } = await updateStudentData(
         validate.data,
-        findExistStudent.certificateData
+        findExistStudent.certificateData,
+        findExistStudent.verifyUrl
       );
       return { message };
     }
@@ -47,13 +49,25 @@ export const certificateCrud = async (values: z.infer<typeof student>) => {
 export const addCertificate = async (values: z.infer<typeof student>) => {
   try {
     const { id, name, studentId, certificate, eventId } = values;
-    console.log(certificate);
+
+    if (!(certificate instanceof File))
+      return { message: "Provide certificate", variant: "error" };
+
+    //generating link
+    const stampLink = `http://localhost:3000/view-certificate/${id}`;
+    //verifying pdf by attaching link
+    const verifiedFile = await verifyPdf(certificate, stampLink);
+    const verifiedCertificate = verifiedFile.get("file") as File;
     //uploading to supabase
     const { data, error } = await storageClient
       .from("organization/image")
-      .upload(`${eventId}_${studentId}_${certificate.name}`, certificate, {
-        cacheControl: "3600",
-      });
+      .upload(
+        `${eventId}_${studentId}_${certificate.name}`,
+        verifiedCertificate,
+        {
+          cacheControl: "3600",
+        }
+      );
     if (error) return { message: "something went wrong", variant: "error" };
     //creating new student
     const certificateDetails = {
@@ -70,13 +84,14 @@ export const addCertificate = async (values: z.infer<typeof student>) => {
         studentId,
         certificateData: certificateDetails,
         eventId,
+        verifyUrl: stampLink,
       },
     });
     //revalidating path
     revalidatePath(`/app/event/${eventId}`);
     return { message: "Successfully added", variant: "success" };
   } catch (error) {
-    //throw error;
+   // throw error;
     return { message: "Something went wrong", variant: "error" };
   }
 };
@@ -84,7 +99,8 @@ export const addCertificate = async (values: z.infer<typeof student>) => {
 //update student data
 export const updateStudentData = async (
   values: z.infer<typeof student>,
-  existCertificate: JsonValue
+  existCertificate: JsonValue,
+  verifyUrl:string
 ) => {
   try {
     const { id, name, studentId, certificate, eventId } = values;
@@ -95,11 +111,19 @@ export const updateStudentData = async (
         .from("organization")
         .remove([`image/${(existCertificate as certificateType)?.path}`]);
       //if file update file
+      //verifying pdf by attaching link
+      const verifiedFile = await verifyPdf(certificate, verifyUrl);
+      const verifiedCertificate = verifiedFile.get("file") as File;
+      //upload to supabase
       const { data, error } = await storageClient
-        .from("organization")
-        .upload(`${eventId}_${studentId}_${certificate.name}`, certificate, {
-          cacheControl: "3600",
-        });
+        .from("organization/image")
+        .upload(
+          `${eventId}_${studentId}_${certificate.name}`,
+          verifiedCertificate,
+          {
+            cacheControl: "3600",
+          }
+        );
       if (error) return { message: "something went wrong", variant: "error" };
       console.log(data);
       newCertificate = {
@@ -186,3 +210,18 @@ export const deleteStudentById = async (id: string, eventId: string) => {
     return { message: "please try again", variant: "error" };
   }
 };
+
+
+export const getStudentByCertifcateId = async(id: string)=>{
+  try {
+    const data = await prisma.certificate.findUnique({
+      where:{
+        id
+      }
+    });
+
+    return data;
+  } catch (error) {
+    console.log(error)
+  }
+}
