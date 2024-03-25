@@ -12,11 +12,19 @@ const { auth } = NextAuth(authConfig);
 export default auth((req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
-
+  // console.log(nextUrl.pathname)
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
-  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+  const isPublicRoute = publicRoutes.some((route) =>
+    route.includes("[id]")
+      ? nextUrl.pathname.startsWith(route.replace("[id]", ""))
+      : nextUrl.pathname === route
+  );
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
   if (isApiAuthRoute) {
+    return null;
+  }
+
+  if (isPublicRoute) {
     return null;
   }
 
