@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { BsGithub } from "react-icons/bs";
+import { RiUserShared2Fill } from "react-icons/ri";
 import { GrMenu } from "react-icons/gr";
 import {
   Sheet,
@@ -15,7 +16,7 @@ import { ThemeToggle } from "./theme-toggle";
 
 export default function Navbar({}): any {
   return (
-    <nav className="w-full backdrop-blur-md bg-opacity-30 z-50 fixed h-24 flex justify-between items-center py-10 px-4 md:px-8 lg:px-12 xl:px-16 2xl:px-24">
+    <nav className="w-full backdrop-blur-md bg-opacity-30 z-50 fixed h-24 flex justify-between items-center py-10 px-4 md:px-8 lg:px-12 xl:px-16 2xl:px-24 border-b-2">
       <Link href="/">
         <Image
           alt="logo-dark"
@@ -48,21 +49,35 @@ export default function Navbar({}): any {
         </Link>
         <ThemeToggle />
       </div>
-      <Link
-        href="https://github.com/rajarshisamaddar/unicever-2024"
-        target="_blank"
-      >
-        <Button
-          variant="default"
-          className="rounded-full w-fit bg-primary gap-2 items-center hidden md:flex"
-          size="lg"
+      <div className="flex space-x-4">
+        <Link href="/sign-in">
+          <Button
+            variant="default"
+            className="rounded-full w-fit bg-primary gap-2 items-center hidden md:flex"
+            size="lg"
+          >
+            <span>Sign in</span>
+            <span className="text-xl">
+              <RiUserShared2Fill />
+            </span>
+          </Button>
+        </Link>
+        <Link
+          href="https://github.com/rajarshisamaddar/unicever-2024"
+          target="_blank"
         >
-          <span>GitHub</span>
-          <span className="text-xl">
-            <BsGithub />
-          </span>
-        </Button>
-      </Link>
+          <Button
+            variant="secondary"
+            className="rounded-full w-fit bg-secondary gap-2 items-center hidden md:flex"
+            size="lg"
+          >
+            <span>GitHub</span>
+            <span className="text-xl">
+              <BsGithub />
+            </span>
+          </Button>
+        </Link>
+      </div>
 
       {/* MOBILE NAV */}
       <Sheet>
@@ -102,14 +117,26 @@ export default function Navbar({}): any {
                   </Link>
                   <ThemeToggle variant="link" />
                 </div>
-                <div className="w-full flex justify-center">
+                <div className="w-full flex flex-col items-center space-y-4">
+                  <Link href="/sign-in">
+                    <Button
+                      variant="default"
+                      className="rounded-full w-fit bg-primary gap-2 items-center flex"
+                      size="lg"
+                    >
+                      <span>Sign in</span>
+                      <span className="text-xl">
+                        <RiUserShared2Fill />
+                      </span>
+                    </Button>
+                  </Link>
                   <Link
                     href="https://github.com/rajarshisamaddar/unicever-2024"
                     target="_blank"
                   >
                     <Button
-                      variant="default"
-                      className="rounded-full w-fit bg-primary gap-2 items-center flex"
+                      variant="secondary"
+                      className="rounded-full w-fit bg-secondary gap-2 items-center flex"
                       size="lg"
                     >
                       <span>GitHub</span>
