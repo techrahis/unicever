@@ -12,3 +12,9 @@ export type studentType = {
     certificateData:certificateType | JsonValue | null,
     eventId:string | null
 }
+
+export  type certificateXlsxType = {
+    name:string | null,
+    studentId:string|null,
+    verifyUrl: string | null
+}
