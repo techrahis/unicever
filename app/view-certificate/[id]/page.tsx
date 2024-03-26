@@ -1,7 +1,6 @@
-import { getStudentByCertifcateId } from '@/server/add-student'
+import { getStudentByCertifcateId } from '@/server/add-student';
 import { certificateType, studentType } from '@/types/studentType';
-import Image from 'next/image';
-import React from 'react'
+import PdfViewer from '../_components/PdfViewer';
 
 const ViewCertificate = async({params}: {params:{id:string}}) => {
   const studentData:studentType | null|undefined = await getStudentByCertifcateId(params.id);
@@ -11,11 +10,7 @@ const ViewCertificate = async({params}: {params:{id:string}}) => {
       <h1>
         {studentData.name}
       </h1>
-      {
-        studentData.certificateData as certificateType && (
-          <iframe src={(studentData.certificateData as certificateType)?.src!} width={800} height={800} frameBorder={0}></iframe>
-        )
-      }
+      <PdfViewer studentData={studentData} />
     </div>
   )
 }

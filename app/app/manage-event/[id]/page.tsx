@@ -4,10 +4,22 @@ import React from "react";
 import AddCertificate from "../_components/AddCertificate";
 import { getStudentsByEventId } from "@/server/add-student";
 import BackButton from "../../_components/BackButton";
-
+import ExcelGenerator from "../_components/ExcelGenerator";
+import prisma from "@/lib/prisma";
 const EventDetails = async ({ params }: { params: { id: string } }) => {
   const event = await getEventById(params.id);
   const studentsByEvent = await getStudentsByEventId(event?.id!);
+  const allStudentData = await prisma.certificate.findMany({
+    where: {
+      eventId: event?.id,
+    },
+    select:{
+      name:true,
+      studentId:true,
+      verifyUrl:true,
+    }
+  });
+
   return (
     <div>
       <BackButton />
@@ -22,6 +34,9 @@ const EventDetails = async ({ params }: { params: { id: string } }) => {
 
         <CardContent>
           <p className="text-sm">{event?.description}</p>
+          {Array.isArray(studentsByEvent) && studentsByEvent.length > 0 && (
+            <ExcelGenerator allStudentData={allStudentData} />
+          )}
           <AddCertificate eventId={event?.id} studentsData={studentsByEvent} />
         </CardContent>
       </Card>
