@@ -9,6 +9,13 @@ const ExcelGenerator = ({
 }) => {
   const handleDownload = () => {
     const worksheet = XLSX.utils.json_to_sheet(allStudentData);
+    allStudentData.forEach((data, index) => {
+      worksheet[`C${index + 2}`] = {
+        t: "s", // Set cell type to hyperlink
+        v: data.verifyUrl, // Set hyperlink display text
+        l: { Target: data.verifyUrl }, // Set hyperlink target
+      };
+    });
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Certificates");
 
@@ -30,13 +37,13 @@ const ExcelGenerator = ({
     document.body.removeChild(a);
   };
   return (
-    <div className="my-4">
+    <div className="my-4 w-full flex sm:justify-end">
       <Button
-        variant="ghost"
-        className="capitalize"
+        variant="link"
+        className="capitalize text-blue-800"
         onClick={handleDownload}
       >
-        get certificates data
+        Export Student Records
       </Button>
     </div>
   );
