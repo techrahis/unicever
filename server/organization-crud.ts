@@ -71,7 +71,6 @@ export const OrganizationUpdate = async (
     revalidatePath("/app/profile");
     return { message: "✅ data updated successfully", variant: "success" };
   } catch (error) {
-    throw error;
     return {
       message: "❌ something went wrong please try again",
       variant: "error",
