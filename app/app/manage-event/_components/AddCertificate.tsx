@@ -10,20 +10,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
-import {
-  student,
-  studentSchema
-} from "@/schemas/student";
+import { student, studentSchema } from "@/schemas/student";
 import { certificateCrud, deleteStudentById } from "@/server/add-student";
 import { certificateType, studentType } from "@/types/studentType";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, ListPlus } from "lucide-react";
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { MutableRefObject, useRef, useState, useTransition } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { v4 as uuid4 } from "uuid";
 import { z } from "zod";
 import { formatTime } from "../../profile/_components/formatTime";
+import { fileNameShort, fileNameShort2_0 } from "./fileNameShort";
 const AddCertificate = ({
   eventId,
   studentsData,
@@ -47,6 +45,7 @@ const AddCertificate = ({
   const [isSavePending, startSaveTransition] = useTransition();
   const [isDeletePending, startDeleteTransition] = useTransition();
   const [currentIndex, setCurrentIndex] = useState<number | null>(1);
+  const fileRef: MutableRefObject<(HTMLInputElement | null)[]> = useRef([]);
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "student",
@@ -66,9 +65,7 @@ const AddCertificate = ({
       const { message } = await certificateCrud({
         ...values,
         certificate:
-          values.certificate instanceof File
-            ? formData
-            : values.certificate,
+          values.certificate instanceof File ? formData : values.certificate,
       });
       toast({
         title: message,
@@ -92,8 +89,8 @@ const AddCertificate = ({
   };
   return (
     <div className="mt-4 flex flex-col space-y-4">
-      {fields.map((field, index) => (
-        <Form {...form} key={field.id}>
+      {fields.map((Inputfield, index) => (
+        <Form {...form} key={Inputfield.id}>
           <form
             onSubmit={form.handleSubmit(() => {
               const formData = form.getValues().student[index];
@@ -167,14 +164,52 @@ const AddCertificate = ({
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
+                      <div className="flex gap-2 items-center bg-transparent border border-border rounded-md">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => fileRef.current[index]?.click()}
+                        >
+                          {(studentsData?.[index]
+                            ?.certificateData as certificateType)
+                            ? "Change File"
+                            : "Choose File"}
+                        </Button>
+                        <div id={`file-name-${index}`}>
+                          <p className="text-sm">
+                            {(studentsData?.[index]
+                              ?.certificateData as certificateType)
+                              ? fileNameShort(
+                                  (
+                                    studentsData?.[index]
+                                      ?.certificateData as certificateType
+                                  )?.path?.split("_")[2]
+                                )
+                              : "No file cho.."}
+                          </p>
+                        </div>
+                      </div>
                       <FormControl>
                         <Input
                           type="file"
+                          className="hidden"
+                          ref={(el: HTMLInputElement | null) =>
+                            (fileRef.current[index] = el)
+                          }
                           onChange={(event) => {
                             const fileList = event.target.files;
                             if (fileList && fileList.length > 0) {
                               const firstFile = fileList[0];
                               field.onChange(firstFile);
+
+                              const fileName = document.getElementById(
+                                `file-name-${index}`
+                              );
+                              if (fileName) {
+                                fileName.textContent = fileNameShort2_0(
+                                  firstFile.name
+                                );
+                              }
                             }
                           }}
                         />
