@@ -54,7 +54,7 @@ export const addCertificate = async (values: z.infer<typeof student>) => {
       return { message: "Provide certificate", variant: "error" };
 
     //generating link
-    const stampLink = `http://localhost:3000/view-certificate/${id}`;
+    const stampLink = `http://localhost:3000/verify/${id}`;
     //verifying pdf by attaching link
     const verifiedFile = await verifyPdf(certificate, stampLink);
     const verifiedCertificate = verifiedFile.get("file") as File;
