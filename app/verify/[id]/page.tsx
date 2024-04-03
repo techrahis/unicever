@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getStudentByCertifcateId } from "@/server/add-student";
 import { getEventById } from "@/server/event-create";
 import { getOrganizationById } from "@/server/organization-crud";
@@ -48,7 +43,7 @@ const ViewCertificate = async ({ params }: { params: { id: string } }) => {
         <Card className="h-fit">
           <CardHeader>
             <CardTitle>{eventData?.title}</CardTitle>
-            <div className="flex justify-between items-center">
+            <div className="">
               <div className="text-sm text-muted-foreground flex items-center gap-1">
                 <MapPin className="h-3 w-3 text-blue-600" />
                 <p>{eventData?.location}</p>
@@ -58,16 +53,17 @@ const ViewCertificate = async ({ params }: { params: { id: string } }) => {
                 <p>{eventData?.date.toLocaleDateString()}</p>
               </div>
             </div>
-            <CardContent>
-              <p className="text-sm">{eventData?.description}</p>
-            </CardContent>
           </CardHeader>
+          <CardContent>
+            <p className="text-sm">{eventData?.description}</p>
+          </CardContent>
         </Card>
         <PdfViewer studentData={studentData} />
       </div>
 
       <p className="w-full text-center text-sm text-muted-foreground mt-8 capitalize">
-        verified by <span className="text-fuchsia-600">&#10051; unicever &#10051;</span>
+        verified by{" "}
+        <span className="text-fuchsia-600">&#10051; unicever &#10051;</span>
       </p>
     </div>
   );
