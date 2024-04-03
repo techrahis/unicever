@@ -29,6 +29,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import BackButton from "../../_components/BackButton";
 
 const CreateEvent = ({
   organization,
@@ -74,6 +75,7 @@ const CreateEvent = ({
   };
   return (
     <div>
+      <BackButton />
       <Card>
         <CardHeader>
           <CardTitle>Create or Edit Your Event</CardTitle>

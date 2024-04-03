@@ -88,3 +88,17 @@ export const getOrganization = async (userId: string) => {
 
   return data;
 };
+
+export const getOrganizationById = async(id: string)=>{
+  try {
+    const data = await prisma.organization.findUnique({
+      where:{
+        id
+      }
+    });
+    return data;
+  } catch (error) {
+    console.log(error);
+    return;
+  }
+}

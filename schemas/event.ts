@@ -5,6 +5,6 @@ export const eventSchema = z.object({
     orgId:z.string(),
     title:z.string().min(1, {message:"Please add a title"}),
     location: z.string().min(1, {message:"Please add location"}),
-    date:z.string(),
+    date:z.string().min(1, {message:"Please choose a date"}),
     description:z.string().min(10, {message:"Please add a short description"})
 })

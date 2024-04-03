@@ -24,6 +24,9 @@ export default async function Page() {
       organizationId: organization?.id,
     },
   });
+  if(events.length<=0){
+    return <EmptyEvent />
+  }
   return (
     <div>
       <div className="flex justify-end my-4 items-center">
@@ -37,42 +40,38 @@ export default async function Page() {
         </Link>
       </div>
 
-      {events.length > 0 ? (
-        <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {events.map((event) => (
-            <Card key={event.id}>
-              <CardHeader>
-                <CardTitle>{event.title}</CardTitle>
-                <div className="text-[0.8rem] text-muted-foreground flex justify-between items-center">
-                  <p className="text-primary">{event.location}</p>
-                  <p>{event.date.toLocaleDateString()}</p>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm font-normal">
-                  {event.description?.slice(0, 80) + "..."}
-                </p>
-              </CardContent>
-              <CardFooter className="flex items-center gap-2">
-                <Link
-                  href={`/app/manage-event/${event.id}`}
-                  className={buttonVariants({ variant: "secondary" })}
-                >
-                  Manage
-                </Link>
-                <Link
-                  href={`/app/events/${event.id}`}
-                  className={buttonVariants({ variant: "outline" })}
-                >
-                  Edit
-                </Link>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <EmptyEvent />
-      )}
+      <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {events.map((event) => (
+          <Card key={event.id}>
+            <CardHeader>
+              <CardTitle>{event.title}</CardTitle>
+              <div className="text-[0.8rem] text-muted-foreground flex justify-between items-center">
+                <p className="text-primary">{event.location}</p>
+                <p>{event.date.toLocaleDateString()}</p>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm font-normal">
+                {event.description?.slice(0, 80) + "..."}
+              </p>
+            </CardContent>
+            <CardFooter className="flex items-center gap-2">
+              <Link
+                href={`/app/manage-event/${event.id}`}
+                className={buttonVariants({ variant: "secondary" })}
+              >
+                Manage
+              </Link>
+              <Link
+                href={`/app/events/${event.id}`}
+                className={buttonVariants({ variant: "outline" })}
+              >
+                Edit
+              </Link>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }
