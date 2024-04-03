@@ -11,7 +11,7 @@ const CertificateNotFound = () => {
         <Image src={CertificateNotfoundSvg} alt="not-found" fill/>
       </div>
       <div className="flex flex-col items-center justify-center gap-2">
-      <p>Certificate Not Found</p>
+      <p className='text-sm text-muted-foreground'>Oops! Certificate Not Found</p>
       <Link href='/app' className={buttonVariants({variant:"secondary"})}>Back to Home &#11127;</Link>
       </div>
     </div>
