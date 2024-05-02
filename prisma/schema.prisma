@@ -68,8 +68,8 @@ model Event {
   description    String?
   date           DateTime
   location       String?
-  image          String?
-  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  image          String? 
+  Organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String?
   certificates    Certificate[]
 }
@@ -80,7 +80,7 @@ model Certificate {
   studentId   String
   certificateData Json
   verifyUrl String
-  Event       Event   @relation(fields: [eventId], references: [id])
+  Event       Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId     String
   createdAt   DateTime @default(now())
 }
