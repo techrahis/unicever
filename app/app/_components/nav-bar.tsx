@@ -33,7 +33,20 @@ export default async function NavBar() {
   return (
     <nav className="flex justify-between items-center border-b-2 py-3">
       <Link href="/app">
-        <Image src="/logo.svg" alt="Unicever Logo" width={150} height={150} />
+        <Image
+          src="/logo-dark.svg"
+          className="hidden dark:block"
+          alt="Unicever Logo"
+          width={150}
+          height={150}
+        />
+        <Image
+          src="/logo-light.svg"
+          className="dark:hidden block"
+          alt="Unicever Logo"
+          width={150}
+          height={150}
+        />
       </Link>
       <section className="flex items-center space-x-2">
         <span>
