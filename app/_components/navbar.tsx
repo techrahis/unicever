@@ -16,19 +16,20 @@ import { ThemeToggle } from "./theme-toggle";
 
 export default function Navbar({}): any {
   return (
-    <nav className="w-full backdrop-blur-md bg-opacity-30 z-50 fixed h-24 flex justify-between items-center py-10 px-4 md:px-8 lg:px-12 xl:px-16 2xl:px-24 border-b-2">
+    <nav className="w-full backdrop-blur-md bg-opacity-30 z-50 sticky top-0
+     h-24 flex justify-between items-center py-10 px-4 md:px-8 lg:px-12 xl:px-16 2xl:px-24 border-b-2">
       <Link href="/">
         <Image
           alt="logo-dark"
           className="cursor-pointer w-40 hidden dark:block"
-          src="/logo.svg"
+          src="/logo-dark.svg"
           height={100}
           width={170}
         />
         <Image
           alt="logo-light"
           className="cursor-pointer w-40 dark:hidden"
-          src="/logo.svg"
+          src="/logo-light.svg"
           height={100}
           width={170}
         />
@@ -50,7 +51,7 @@ export default function Navbar({}): any {
         <ThemeToggle />
       </div>
       <div className="flex space-x-4">
-        <Link href="/sign-in">
+        <Link href="/auth/sign-in">
           <Button
             variant="default"
             className="rounded-full w-fit bg-primary gap-2 items-center hidden md:flex"
