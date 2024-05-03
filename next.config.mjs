@@ -6,6 +6,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "i.imgur.com",
       },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+      },
     ],
   },
 
@@ -15,6 +19,5 @@ const nextConfig = {
     return config;
   },
 };
-
 
 export default nextConfig;

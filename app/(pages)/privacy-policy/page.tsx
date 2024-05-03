@@ -4,7 +4,7 @@ export default function PrivacyPolicy() {
   return (
     <main>
       <NavBar />
-      <section className="flex min-h-screen flex-col justify-between p-24 space-y-6 pt-32">
+      <section className="flex min-h-screen flex-col justify-between p-24 space-y-6 pt-8">
         <p className="text-sm">Last Updated: Thursday 2 May 2024</p>
         <p>
           Welcome to UNICEVER, a platform committed to safeguarding your privacy
@@ -113,7 +113,7 @@ export default function PrivacyPolicy() {
           <p>
             If you have any questions, concerns, or feedback regarding our
             Privacy Policy or the handling of your personal information, please
-            don&apos;t hesitate to contact us at
+            don&apos;t hesitate to contact us at{" "}
             <a
               className="text-blue-500 font-semibold"
               href="unicever2024@gmail.com"

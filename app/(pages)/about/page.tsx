@@ -4,7 +4,7 @@ export default function About() {
   return (
     <main>
       <NavBar />
-      <section className="flex min-h-screen flex-col justify-between p-24 space-y-6 pt-32">
+      <section className="flex min-h-screen flex-col justify-between p-24 space-y-6 pt-8">
         <p className="text-sm">Last Updated: Thursday 2 May 2024</p>
         <p>
           Welcome to UNICEVER, an innovative project aimed at revolutionizing
