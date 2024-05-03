@@ -1,7 +1,13 @@
 {
-  "name": "unicever-2024",
-  "version": "0.1.0",
-  "private": true,
+  "name": "unicever",
+  "version": "1.1.0",
+  "private": false,
+  "license": "MIT",
+  "author": {
+    "name": "Rajarshi Samaddar",
+    "email": "me@rajarshisamaddar.com",
+    "url": "https://rajarshisamaddar.com"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
