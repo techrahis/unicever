@@ -1,4 +1,12 @@
 import NavBar from "@/app/app/_components/nav-bar";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Unicever - App",
+  description:
+    "Unicever is a certificate verification website used to attach verify link in certificate to ensure certificates legitimacy",
+};
+
 export default function AppLayout({
   children,
 }: Readonly<{

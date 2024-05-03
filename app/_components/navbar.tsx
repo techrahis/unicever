@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "./theme-toggle";
 
-export default function Navbar({}): any {
+export default function Navbar({ }): any {
   return (
     <nav className="w-full backdrop-blur-md bg-opacity-30 z-50 sticky top-0
      h-24 flex justify-between items-center py-10 px-4 md:px-8 lg:px-12 xl:px-16 2xl:px-24 border-b-2">
@@ -64,7 +64,7 @@ export default function Navbar({}): any {
           </Button>
         </Link>
         <Link
-          href="https://github.com/rajarshisamaddar/unicever-2024"
+          href="https://github.com/rajarshisamaddar/unicever"
           target="_blank"
         >
           <Button
@@ -132,7 +132,7 @@ export default function Navbar({}): any {
                     </Button>
                   </Link>
                   <Link
-                    href="https://github.com/rajarshisamaddar/unicever-2024"
+                    href="https://github.com/rajarshisamaddar/unicever"
                     target="_blank"
                   >
                     <Button

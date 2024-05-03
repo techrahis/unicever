@@ -54,7 +54,7 @@ export const addCertificate = async (values: z.infer<typeof student>) => {
       return { message: "Provide certificate", variant: "error" };
 
     //generating link
-    const stampLink = `http://localhost:3000/verify/${id}`;
+    const stampLink = `http://unicever.vercel.app/verify/${id}`;
     //verifying pdf by attaching link
     const verifiedFile = await verifyPdf(certificate, stampLink);
     const verifiedCertificate = verifiedFile.get("file") as File;
@@ -91,7 +91,7 @@ export const addCertificate = async (values: z.infer<typeof student>) => {
     revalidatePath(`/app/event/${eventId}`);
     return { message: "Successfully added", variant: "success" };
   } catch (error) {
-   // throw error;
+    // throw error;
     return { message: "Something went wrong", variant: "error" };
   }
 };
@@ -100,7 +100,7 @@ export const addCertificate = async (values: z.infer<typeof student>) => {
 export const updateStudentData = async (
   values: z.infer<typeof student>,
   existCertificate: JsonValue,
-  verifyUrl:string
+  verifyUrl: string
 ) => {
   try {
     const { id, name, studentId, certificate, eventId } = values;
@@ -211,17 +211,16 @@ export const deleteStudentById = async (id: string, eventId: string) => {
   }
 };
 
-
-export const getStudentByCertifcateId = async(id: string)=>{
+export const getStudentByCertifcateId = async (id: string) => {
   try {
     const data = await prisma.certificate.findUnique({
-      where:{
-        id
-      }
+      where: {
+        id,
+      },
     });
 
     return data;
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};

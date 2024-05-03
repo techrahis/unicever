@@ -7,8 +7,17 @@ import Image from "next/image";
 import Link from "next/link";
 import PdfViewer from "../_components/PdfViewer";
 import CertificateNotFound from "../_components/CertificateNotFound";
+import { Metadata } from "next";
+
+
+export const metadata: Metadata = {
+  title: "Unicever - Certificate Verification",
+  description:
+    "Unicever is a certificate verification website used to attach verify link in certificate to ensure certificates legitimacy",
+};
 
 const ViewCertificate = async ({ params }: { params: { id: string } }) => {
+
   const studentData = await getStudentByCertifcateId(params.id);
   const eventData = await getEventById(studentData?.eventId as string);
   const organizationData = await getOrganizationById(
