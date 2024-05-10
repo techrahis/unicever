@@ -4,8 +4,10 @@ import { certificateXlsxType } from "@/types/studentType";
 import * as XLSX from "xlsx";
 const ExcelGenerator = ({
   allStudentData,
+  eventData,
 }: {
   allStudentData: certificateXlsxType[];
+  eventData: string | undefined;
 }) => {
   const handleDownload = () => {
     const worksheet = XLSX.utils.json_to_sheet(allStudentData);
@@ -30,7 +32,7 @@ const ExcelGenerator = ({
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "certificateData.xlsx";
+    a.download = `${eventData}.xlsx`;
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);

@@ -105,10 +105,9 @@ const AddCertificate = ({
               </h1>
               {(studentsData?.[index]?.certificateData as certificateType) && (
                 <Link
-                  href={`${
-                    (studentsData?.[index]?.certificateData as certificateType)
-                      ?.src
-                  }`}
+                  href={`${(studentsData?.[index]?.certificateData as certificateType)
+                    ?.src
+                    }`}
                   target="_blank"
                 >
                   <Eye className="h-4 w-4 text-indigo-700 " />
@@ -180,11 +179,11 @@ const AddCertificate = ({
                             {(studentsData?.[index]
                               ?.certificateData as certificateType)
                               ? fileNameShort(
-                                  (
-                                    studentsData?.[index]
-                                      ?.certificateData as certificateType
-                                  )?.path?.split("_")[2]
-                                )
+                                (
+                                  studentsData?.[index]
+                                    ?.certificateData as certificateType
+                                )?.path?.split("_")[2]
+                              )
                               : "No file cho.."}
                           </p>
                         </div>

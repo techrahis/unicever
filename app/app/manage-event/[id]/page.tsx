@@ -13,10 +13,10 @@ const EventDetails = async ({ params }: { params: { id: string } }) => {
     where: {
       eventId: event?.id,
     },
-    select:{
-      name:true,
-      studentId:true,
-      verifyUrl:true,
+    select: {
+      name: true,
+      studentId: true,
+      verifyUrl: true,
     }
   });
 
@@ -35,7 +35,7 @@ const EventDetails = async ({ params }: { params: { id: string } }) => {
         <CardContent>
           <p className="text-sm">{event?.description}</p>
           {Array.isArray(studentsByEvent) && studentsByEvent.length > 0 && (
-            <ExcelGenerator allStudentData={allStudentData} />
+            <ExcelGenerator allStudentData={allStudentData} eventData={event?.title} />
           )}
           <AddCertificate eventId={event?.id} studentsData={studentsByEvent} />
         </CardContent>
