@@ -26,20 +26,20 @@ export default function Home() {
         <div className="w-[80%] mx-auto mt-4">
           <div className="w-full h-fit p-4 flex justify-center gap-4">
             <div
-              className="h-72 w-72 overflow-hidden relative  
+              className="h-20 w-20 md:h-40 md:w-40 lg:h-72 lg:w-72 overflow-hidden relative  
             shadow-2xl shadow-gray-600 -rotate-12 dark:shadow-indigo-600/20
             bg-gray-400"
             >
               <Image src={Banner2} alt="banner1" fill />
             </div>
             <div
-              className="h-80 w-80 overflow-hidden relative scale-125 z-[10] 
+              className="h-24 w-24 md:h-48 md:w-48 lg:h-80 lg:w-80 overflow-hidden relative scale-125 z-[10] 
             shadow-2xl shadow-gray-600 dark:shadow-indigo-600/20 bg-gray-400"
             >
               <Image src={Banner1} alt="banner1" fill />
             </div>
             <div
-              className="h-72 w-72 overflow-hidden relative  shadow-2xl 
+              className="h-20 w-20 md:h-40 md:w-40 lg:h-72 lg:w-72 overflow-hidden relative  shadow-2xl 
             shadow-gray-600 rotate-12 dark:shadow-indigo-600/20 bg-gray-400"
             >
               <Image src={Banner3} alt="banner1" fill />
@@ -65,10 +65,10 @@ export default function Home() {
           </div>
 
           <div className="mb-20">
-            <div className="my-2 grid grid-cols-[1fr,2fr] gap-8 justify-center items-center">
+            <div className="my-2 grid lg:grid-cols-[1fr,2fr] gap-8 justify-center items-center">
               <div
-                className="w-full h-[22rem] p-4 relative overflow-hidden rounded-md 
-              flex justify-center items-center bg-gray-100 dark:bg-gray-500/10"
+                className="w-auto lg:w-full h-[15rem] lg:h-[22rem] p-4 relative overflow-hidden rounded-md 
+              flex justify-center items-center bg-gray-100 dark:bg-gray-400"
               >
                 <Image
                   src={AboutUs}
@@ -76,25 +76,28 @@ export default function Home() {
                   className="h-[90%] w-[90%]"
                 />
               </div>
-              <p className="text-muted-foreground">
-                UNICEVER, standing for United Certification Enhancement and
-                Verification, is a groundbreaking initiative driven by the
-                paramount objective of fortifying the authenticity of digital
-                certificates. In an era where the persistent challenges of
-                forgery and counterfeiting loom large, UNICEVER emerges as a
-                beacon of innovation and reliability. The core essence of this
-                initiative revolves around the development of a cutting-edge
-                open-source tool designed to revolutionize the verification
-                process for digital certificates.unicever is an open-source
-                project that revolutionizes certificate authentication and
-                verification. Empower educational institutions and organizations
-                to issue and validate tamper-proof digital credentials
-                effortlessly. Implement secure issuance, automated verification,
-                and user-friendly access.{" "}
+              <div>
+                <p className="text-muted-foreground line-clamp-6">
+                  UNICEVER, standing for United Certification Enhancement and
+                  Verification, is a groundbreaking initiative driven by the
+                  paramount objective of fortifying the authenticity of digital
+                  certificates. In an era where the persistent challenges of
+                  forgery and counterfeiting loom large, UNICEVER emerges as a
+                  beacon of innovation and reliability. The core essence of this
+                  initiative revolves around the development of a cutting-edge
+                  open-source tool designed to revolutionize the verification
+                  process for digital certificates.unicever is an open-source
+                  project that revolutionizes certificate authentication and
+                  verification. Empower educational institutions and
+                  organizations to issue and validate tamper-proof digital
+                  credentials effortlessly. Implement secure issuance, automated
+                  verification, and user-friendly access.
+                </p>
+
                 <Link href="/about" className="text-[#2563eb] underline">
-                  more...
+                  more
                 </Link>
-              </p>
+              </div>
             </div>
           </div>
         </div>
@@ -154,7 +157,7 @@ export default function Home() {
 
       {/* footer */}
       <footer className="mt-12 shadow-2xl shadow-gray-400 dark:shadow-indigo-500/20 w-full h-fit p-4 px-8 border-t">
-        <div className="flex w-full justify-between items-center">
+        <div className="flex w-full flex-col items-start md:flex-row justify-between lg:items-center">
           <div className="w-36 h-36 relative overflow-hidden">
             <Image
               className="hidden dark:block"
@@ -191,7 +194,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="flex flex-col justify-center gap-4 ">
+          <div className="flex mt-12 lg:mt-0 items-center justify-center gap-4 ">
             <Link
               href="https://github.com/rajarshisamaddar/unicever-2024"
               target="_blank"
