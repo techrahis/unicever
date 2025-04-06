@@ -1,6 +1,6 @@
 "use server";
 import prisma from "@/lib/prisma";
-import storageClient from "@/lib/storageClient";
+import cloudinary from "@/lib/cloudinaryClient";
 import { student } from "@/schemas/student";
 import { certificateType } from "@/types/studentType";
 import { JsonValue } from "@prisma/client/runtime/library";
@@ -45,7 +45,7 @@ export const certificateCrud = async (values: z.infer<typeof student>) => {
   }
 };
 
-//adding new student
+// adding certificate to db and uploading to cloudinary
 export const addCertificate = async (values: z.infer<typeof student>) => {
   try {
     const { id, name, studentId, certificate, eventId } = values;
@@ -53,30 +53,33 @@ export const addCertificate = async (values: z.infer<typeof student>) => {
     if (!(certificate instanceof File))
       return { message: "Provide certificate", variant: "error" };
 
-    //generating link
+    // Generating verification link
     const stampLink = `http://unicever.vercel.app/verify/${id}`;
-    //verifying pdf by attaching link
+
+    // Verifying PDF
     const verifiedFile = await verifyPdf(certificate, stampLink);
     const verifiedCertificate = verifiedFile.get("file") as File;
-    //uploading to supabase
-    const { data, error } = await storageClient
-      .from("organization/image")
-      .upload(
-        `${eventId}_${studentId}_${certificate.name}`,
-        verifiedCertificate,
-        {
-          cacheControl: "3600",
-        }
-      );
-    if (error) return { message: "something went wrong", variant: "error" };
-    //creating new student
+
+    // Convert File to Base64 string for Cloudinary
+    const arrayBuffer = await verifiedCertificate.arrayBuffer();
+    const base64String = Buffer.from(arrayBuffer).toString("base64");
+    const dataUri = `data:${verifiedCertificate.type};base64,${base64String}`;
+
+    // Upload to Cloudinary
+    const uploadResult = await cloudinary.uploader.upload(dataUri, {
+      folder: `UNICEVER/certificates/${eventId}`,
+      public_id: `${eventId}_${studentId}_${certificate.name}`,
+      resource_type: "auto",
+    });
+
+    // Prepare certificate data
     const certificateDetails = {
-      id: (data as any)?.id,
-      src: `https://${
-        process.env.DATABASE_NAME
-      }.supabase.co/storage/v1/object/public/${(data as any).fullPath}`,
-      path: data.path,
+      id: uploadResult.asset_id,
+      src: uploadResult.secure_url,
+      path: uploadResult.public_id, // Store public_id for deletion later
     };
+
+    // Save to DB
     await prisma.certificate.create({
       data: {
         id,
@@ -87,11 +90,12 @@ export const addCertificate = async (values: z.infer<typeof student>) => {
         verifyUrl: stampLink,
       },
     });
-    //revalidating path
+
+    // Revalidate
     revalidatePath(`/app/event/${eventId}`);
     return { message: "Successfully added", variant: "success" };
   } catch (error) {
-    // throw error;
+    console.error("Add Certificate Error:", error);
     return { message: "Something went wrong", variant: "error" };
   }
 };
@@ -105,41 +109,46 @@ export const updateStudentData = async (
   try {
     const { id, name, studentId, certificate, eventId } = values;
     let newCertificate = existCertificate;
-    //chcking certificate is file or not
+
+    // If a new certificate file is uploaded
     if (certificate instanceof File) {
-      await storageClient
-        .from("organization")
-        .remove([`image/${(existCertificate as certificateType)?.path}`]);
-      //if file update file
-      //verifying pdf by attaching link
+      const oldPath = (existCertificate as certificateType)?.path;
+
+      // Delete the old certificate from Cloudinary
+      if (oldPath) {
+        await cloudinary.uploader.destroy(oldPath, {
+          resource_type: "raw",
+        });
+      }
+
+      // Verify and stamp the PDF
       const verifiedFile = await verifyPdf(certificate, verifyUrl);
       const verifiedCertificate = verifiedFile.get("file") as File;
-      //upload to supabase
-      const { data, error } = await storageClient
-        .from("organization/image")
-        .upload(
-          `${eventId}_${studentId}_${certificate.name}`,
-          verifiedCertificate,
-          {
-            cacheControl: "3600",
-          }
-        );
-      if (error) return { message: "something went wrong", variant: "error" };
-      console.log(data);
+
+      // Convert to base64
+      const arrayBuffer = await verifiedCertificate.arrayBuffer();
+      const base64String = Buffer.from(arrayBuffer).toString("base64");
+      const dataUri = `data:${verifiedCertificate.type};base64,${base64String}`;
+
+      // Upload to Cloudinary
+      const uploadResult = await cloudinary.uploader.upload(dataUri, {
+        folder: `UNICEVER/certificates/${eventId}`,
+        public_id: `${eventId}_${studentId}_${certificate.name}`,
+        resource_type: "raw",
+        format: "pdf",
+      });
+
+      // New certificate data
       newCertificate = {
-        id: (data as any)?.id,
-        src: `https://${
-          process.env.DATABASE_NAME
-        }.supabase.co/storage/v1/object/public/${(data as any).fullPath}`,
-        path: data.path,
+        id: uploadResult.asset_id,
+        src: uploadResult.secure_url,
+        path: uploadResult.public_id,
       };
     }
 
-    //updating data
+    // Update certificate data in DB
     await prisma.certificate.update({
-      where: {
-        id: id,
-      },
+      where: { id },
       data: {
         id,
         name,
@@ -149,12 +158,12 @@ export const updateStudentData = async (
       },
     });
 
-    //revalidating path
+    // Revalidate path
     revalidatePath(`/app/event/${eventId}`);
     return { message: "Successfully updated", variant: "success" };
   } catch (error) {
-    //throw error;
-    return { message: "something went wrong", variant: "error" };
+    console.error("Update Certificate Error:", error);
+    return { message: "Something went wrong", variant: "error" };
   }
 };
 
@@ -191,23 +200,30 @@ export const getStudentById = async (id: string) => {
   }
 };
 
-//deleting student based on id
 export const deleteStudentById = async (id: string, eventId: string) => {
   try {
+    // Fetch student with certificate info
     const findStudent = await getStudentById(id);
-    await storageClient
-      .from("organization")
-      .remove([
-        `image/${(findStudent?.certificateData as certificateType)?.path}`,
-      ]);
+    const path = (findStudent?.certificateData as certificateType)?.path;
+
+    // Delete from Cloudinary if path exists
+    if (path) {
+      await cloudinary.uploader.destroy(path, {
+        resource_type: "raw", // for PDFs
+      });
+    }
+
+    // Delete from DB
     await prisma.certificate.delete({
-      where: { id: id },
+      where: { id },
     });
 
+    // Revalidate page
     revalidatePath(`/app/event/${eventId}`);
-    return { message: "successfully deleted", variant: "success" };
+    return { message: "Successfully deleted", variant: "success" };
   } catch (error) {
-    return { message: "please try again", variant: "error" };
+    console.error("Delete Student Error:", error);
+    return { message: "Please try again", variant: "error" };
   }
 };
 
