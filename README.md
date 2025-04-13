@@ -2,6 +2,19 @@
 
 Welcome to UNICEVER, an open-source project dedicated to enhancing the authenticity and trustworthiness of digital certificates. Our platform offers a streamlined solution for educational institutions, organizations, and individuals to issue, manage, and verify certificates with confidence.
 
+## Live View
+Check out the live version of the project [https://unicever.vercel.app](https://unicever.vercel.app).
+
+## Screenshots
+![unicever verce![unicever vercel app_ (1)](https://github.com/user-attachments/assets/26654a9a-bfb9-43f6-8914-c502cd800c1c)
+l app_](https://github.com/user-attachments/assets/758171aa-16e0-4f69-928d-a13385a96400)
+![unicever vercel app_ (2)](https://github.com/user-attachments/assets/e6ec4577-a93c-4f6c-ad12-4184d6ea3dd1)
+![unicever vercel app_ (3)](https://github.com/user-attachments/assets/e1d3008d-8631-4936-ae39-5554bd5bab86)
+![unicever vercel app_ (4)](https://github.com/user-attachments/assets/3a2efc72-1fc7-4e5d-87b7-f7da51281984)
+![unicever vercel app_ (5)](https://github.com/user-attachments/assets/ac1364e0-cd5f-4af8-b521-d3695a41cfc4)
+![unicever vercel app_verify_ae781d7e-5e76-4a45-ad7f-1a49e0c8beb3](https://github.com/user-attachments/assets/83cac0fc-ce2c-46a7-82cf-0ec380511303)
+
+
 Key Features:
 
 - Secure Certificate Issuance: Generate and distribute tamper-proof digital certificates effortlessly.
